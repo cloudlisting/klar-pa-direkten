@@ -1,4 +1,4 @@
-import { Check, Circle, Clock, CreditCard, Flag, Truck, XCircle, AlertTriangle } from "lucide-react";
+import { Check, Circle, Clock, CreditCard, Flag, Truck, XCircle, AlertTriangle, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface StatusStep {
@@ -8,15 +8,25 @@ interface StatusStep {
 }
 
 const STATUS_STEPS: StatusStep[] = [
-  { key: "published", label: "Publicerad", icon: <Circle size={16} /> },
-  { key: "in_bidding", label: "Tar emot bud", icon: <Clock size={16} /> },
+  { key: "open", label: "Öppen", icon: <Circle size={16} /> },
   { key: "assigned", label: "Tilldelad", icon: <Check size={16} /> },
   { key: "in_progress", label: "Pågår", icon: <Truck size={16} /> },
   { key: "completed_pending_release", label: "Slutförd", icon: <Flag size={16} /> },
   { key: "paid", label: "Betald", icon: <CreditCard size={16} /> },
 ];
 
-const STATUS_ORDER = ["draft", "published", "in_bidding", "assigned", "in_progress", "completed_pending_release", "paid"];
+// Mapping from actual status to timeline position
+const STATUS_MAPPING: Record<string, string> = {
+  published: "open",
+  instant_open: "open",
+  in_bidding: "open",
+  assigned: "assigned",
+  in_progress: "in_progress",
+  completed_pending_release: "completed_pending_release",
+  paid: "paid",
+};
+
+const STATUS_ORDER = ["open", "assigned", "in_progress", "completed_pending_release", "paid"];
 
 interface StatusTimelineProps {
   currentStatus: string;
@@ -58,11 +68,21 @@ const StatusTimeline = ({ currentStatus, className }: StatusTimelineProps) => {
     );
   }
 
-  const currentIndex = STATUS_ORDER.indexOf(currentStatus);
+  const mappedStatus = STATUS_MAPPING[currentStatus] || currentStatus;
+  const currentIndex = STATUS_ORDER.indexOf(mappedStatus);
+  const isInstantOpen = currentStatus === "instant_open";
 
   return (
     <div className={cn("rounded-xl border border-border bg-card p-5", className)}>
       <h3 className="font-semibold text-foreground mb-4">Status</h3>
+      
+      {isInstantOpen && (
+        <div className="flex items-center gap-2 text-sm text-accent mb-4 pb-4 border-b border-border">
+          <Zap size={16} />
+          <span className="font-medium">Direktbokning aktiverad</span>
+        </div>
+      )}
+      
       <div className="relative">
         {/* Progress line */}
         <div className="absolute left-[11px] top-3 bottom-3 w-0.5 bg-border" />
@@ -75,10 +95,10 @@ const StatusTimeline = ({ currentStatus, className }: StatusTimelineProps) => {
 
         {/* Steps */}
         <div className="space-y-4 relative">
-          {STATUS_STEPS.map((step, index) => {
+          {STATUS_STEPS.map((step) => {
             const stepIndex = STATUS_ORDER.indexOf(step.key);
             const isCompleted = stepIndex <= currentIndex;
-            const isCurrent = step.key === currentStatus;
+            const isCurrent = step.key === mappedStatus;
 
             return (
               <div key={step.key} className="flex items-center gap-3">

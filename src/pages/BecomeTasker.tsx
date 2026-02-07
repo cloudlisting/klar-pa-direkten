@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SWEDISH_CITIES, MOCK_CATEGORIES } from "@/lib/mock-data";
+import { SWEDISH_CITIES, CATEGORIES } from "@/lib/constants";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { CheckCircle, ArrowRight, X } from "lucide-react";
@@ -160,7 +160,7 @@ const BecomeTasker = () => {
                       Eller välj från kategorier:
                     </p>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {MOCK_CATEGORIES.slice(0, 4).map((cat) => (
+                      {CATEGORIES.slice(0, 4).map((cat) => (
                         <Button
                           key={cat.id}
                           type="button"
