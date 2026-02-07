@@ -1,23 +1,48 @@
 import Layout from "@/components/Layout";
 import TaskCard from "@/components/TaskCard";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { MOCK_TASKS, MOCK_CATEGORIES, SWEDISH_CITIES } from "@/lib/mock-data";
+import { MOCK_CATEGORIES, SWEDISH_CITIES } from "@/lib/mock-data";
 import { Search, SlidersHorizontal, MapPin, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
+
+type Task = Tables<"tasks">;
 
 const BrowseTasks = () => {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = MOCK_TASKS.filter((task) => {
-    const matchesSearch = !search || task.title.toLowerCase().includes(search.toLowerCase()) || task.description.toLowerCase().includes(search.toLowerCase());
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .in("status", ["published", "in_bidding"])
+      .eq("is_hidden", false)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setTasks(data);
+    }
+    setLoading(false);
+  };
+
+  const filtered = tasks.filter((task) => {
+    const matchesSearch = !search || 
+      task.title.toLowerCase().includes(search.toLowerCase()) || 
+      (task.description?.toLowerCase().includes(search.toLowerCase()) ?? false);
     const matchesCategory = selectedCategory === "all" || task.category === MOCK_CATEGORIES.find(c => c.id === selectedCategory)?.name;
-    const matchesCity = selectedCity === "all" || task.location === selectedCity;
+    const matchesCity = selectedCity === "all" || task.city === selectedCity;
     return matchesSearch && matchesCategory && matchesCity;
   });
 
@@ -37,7 +62,7 @@ const BrowseTasks = () => {
             Hitta uppdrag
           </h1>
           <p className="text-muted-foreground mb-6">
-            {filtered.length} uppdrag tillgängliga
+            {loading ? "Laddar..." : `${filtered.length} uppdrag tillgängliga`}
           </p>
 
           {/* Search bar */}
@@ -108,7 +133,11 @@ const BrowseTasks = () => {
       </div>
 
       <div className="container py-8">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-16">
+            <p className="text-muted-foreground">Laddar uppdrag...</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground mb-2">Inga uppdrag matchade din sökning</p>
             <Button variant="outline" onClick={clearFilters}>Rensa filter</Button>
@@ -116,7 +145,24 @@ const BrowseTasks = () => {
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {filtered.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard
+                key={task.id}
+                task={{
+                  id: task.id,
+                  title: task.title,
+                  description: task.description || "",
+                  category: task.category,
+                  location: task.city,
+                  date: task.preferred_date || "",
+                  budget: task.budget_max_sek || task.budget_min_sek || 0,
+                  budgetType: task.budget_type as "fixed" | "hourly",
+                  status: "open",
+                  isRemote: task.is_remote_possible || false,
+                  postedBy: "Kund",
+                  postedAt: new Date(task.created_at).toLocaleDateString("sv-SE"),
+                  offersCount: 0,
+                }}
+              />
             ))}
           </div>
         )}

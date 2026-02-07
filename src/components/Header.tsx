@@ -1,12 +1,21 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Search } from "lucide-react";
+import { Menu, X, User, LogOut, Settings, LayoutDashboard, Shield } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { user, isAdmin, signOut } = useAuth();
 
   const navLinks = [
     { to: "/browse", label: "Hitta uppdrag" },
@@ -42,12 +51,55 @@ const Header = () => {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="ghost" size="sm">
-            Logga in
-          </Button>
-          <Button variant="hero" size="sm">
-            Kom igång
-          </Button>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <User size={16} />
+                  Konto
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard" className="flex items-center gap-2">
+                    <LayoutDashboard size={14} />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="flex items-center gap-2">
+                    <Settings size={14} />
+                    Inställningar
+                  </Link>
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="flex items-center gap-2 text-destructive">
+                        <Shield size={14} />
+                        Admin
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={signOut} className="flex items-center gap-2">
+                  <LogOut size={14} />
+                  Logga ut
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/auth">Logga in</Link>
+              </Button>
+              <Button variant="hero" size="sm" asChild>
+                <Link to="/auth">Kom igång</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -79,12 +131,54 @@ const Header = () => {
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
-                <Button variant="ghost" className="justify-start">
-                  Logga in
-                </Button>
-                <Button variant="hero">Kom igång</Button>
-              </div>
+              {user ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/messages"
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  >
+                    Meddelanden
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-4 py-3 text-sm font-medium text-destructive hover:bg-secondary"
+                    >
+                      Admin
+                    </Link>
+                  )}
+                  <div className="mt-2 border-t border-border pt-2">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        signOut();
+                        setMobileOpen(false);
+                      }}
+                    >
+                      Logga ut
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
+                  <Button variant="ghost" className="justify-start" asChild>
+                    <Link to="/auth" onClick={() => setMobileOpen(false)}>Logga in</Link>
+                  </Button>
+                  <Button variant="hero" asChild>
+                    <Link to="/auth" onClick={() => setMobileOpen(false)}>Kom igång</Link>
+                  </Button>
+                </div>
+              )}
             </nav>
           </motion.div>
         )}
