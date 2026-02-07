@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
+import ReferralSection from "@/components/ReferralSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -129,7 +130,10 @@ const Settings = () => {
             </form>
           </div>
 
-          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6">
+          {/* Referral Section */}
+          <ReferralSection />
+
+          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 mt-6">
             <h2 className="font-semibold text-destructive mb-2">Logga ut</h2>
             <p className="text-sm text-muted-foreground mb-4">
               Du kommer att behöva logga in igen för att använda Taskly.

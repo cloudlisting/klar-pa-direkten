@@ -18,6 +18,8 @@ import Settings from "./pages/Settings";
 import HowItWorks from "./pages/HowItWorks";
 import AdminDashboard from "./pages/AdminDashboard";
 import Checkout from "./pages/Checkout";
+import CategoryPage from "./pages/CategoryPage";
+import CityPage from "./pages/CityPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +46,9 @@ const App = () => (
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/checkout/:taskId/:offerId" element={<Checkout />} />
+            {/* SEO Routes */}
+            <Route path="/kategorier/:slug" element={<CategoryPage />} />
+            <Route path="/stad/:slug" element={<CityPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
