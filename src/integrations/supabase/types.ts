@@ -487,6 +487,7 @@ export type Database = {
       task_status:
         | "draft"
         | "published"
+        | "instant_open"
         | "in_bidding"
         | "assigned"
         | "in_progress"
@@ -638,6 +639,7 @@ export const Constants = {
       task_status: [
         "draft",
         "published",
+        "instant_open",
         "in_bidding",
         "assigned",
         "in_progress",
