@@ -1,13 +1,18 @@
+import { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import CategoryGrid from "@/components/CategoryGrid";
 import TaskCard from "@/components/TaskCard";
-import { MOCK_TASKS } from "@/lib/mock-data";
+import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { ArrowRight, Shield, Zap, Star, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-image.jpg";
+import type { Tables } from "@/integrations/supabase/types";
+
+type Task = Tables<"tasks">;
+type TaskWithOffers = Task & { offers_count: number };
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -19,6 +24,43 @@ const fadeUp = {
 };
 
 const Index = () => {
+  const [latestTasks, setLatestTasks] = useState<TaskWithOffers[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(true);
+
+  useEffect(() => {
+    fetchLatestTasks();
+  }, []);
+
+  const fetchLatestTasks = async () => {
+    // Fetch latest published tasks with offer counts
+    const { data: tasks, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .in("status", ["published", "in_bidding"])
+      .eq("is_hidden", false)
+      .order("created_at", { ascending: false })
+      .limit(4);
+
+    if (!error && tasks) {
+      // Fetch offer counts for each task
+      const taskIds = tasks.map((t) => t.id);
+      const { data: offerCounts } = await supabase
+        .from("offers")
+        .select("task_id")
+        .in("task_id", taskIds);
+
+      const countsMap: Record<string, number> = {};
+      offerCounts?.forEach((o) => {
+        countsMap[o.task_id] = (countsMap[o.task_id] || 0) + 1;
+      });
+
+      setLatestTasks(
+        tasks.map((t) => ({ ...t, offers_count: countsMap[t.id] || 0 }))
+      );
+    }
+    setLoadingTasks(false);
+  };
+
   return (
     <Layout>
       {/* Hero */}
@@ -159,9 +201,41 @@ const Index = () => {
             </Button>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {MOCK_TASKS.slice(0, 4).map((task) => (
-              <TaskCard key={task.id} task={task} />
-            ))}
+            {loadingTasks ? (
+              <p className="col-span-2 text-center py-8 text-muted-foreground">
+                Laddar uppdrag...
+              </p>
+            ) : latestTasks.length === 0 ? (
+              <div className="col-span-2 text-center py-8">
+                <p className="text-muted-foreground mb-4">
+                  Inga uppdrag publicerade ännu
+                </p>
+                <Button variant="hero" asChild>
+                  <Link to="/post-task">Publicera det första uppdraget</Link>
+                </Button>
+              </div>
+            ) : (
+              latestTasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={{
+                    id: task.id,
+                    title: task.title,
+                    description: task.description || "",
+                    category: task.category,
+                    location: task.city,
+                    date: task.preferred_date || "",
+                    budget: task.budget_max_sek || task.budget_min_sek || 0,
+                    budgetType: task.budget_type as "fixed" | "hourly",
+                    status: "open",
+                    isRemote: task.is_remote_possible || false,
+                    postedBy: "Kund",
+                    postedAt: new Date(task.created_at).toLocaleDateString("sv-SE"),
+                    offersCount: task.offers_count,
+                  }}
+                />
+              ))
+            )}
           </div>
           <div className="mt-8 text-center sm:hidden">
             <Button variant="outline" asChild>

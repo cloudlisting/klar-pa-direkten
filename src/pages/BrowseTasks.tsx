@@ -10,13 +10,14 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Task = Tables<"tasks">;
+type TaskWithOffers = Task & { offers_count: number };
 
 const BrowseTasks = () => {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskWithOffers[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,7 +33,21 @@ const BrowseTasks = () => {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      setTasks(data);
+      // Fetch offer counts for all tasks
+      const taskIds = data.map((t) => t.id);
+      const { data: offerCounts } = await supabase
+        .from("offers")
+        .select("task_id")
+        .in("task_id", taskIds);
+
+      const countsMap: Record<string, number> = {};
+      offerCounts?.forEach((o) => {
+        countsMap[o.task_id] = (countsMap[o.task_id] || 0) + 1;
+      });
+
+      setTasks(
+        data.map((t) => ({ ...t, offers_count: countsMap[t.id] || 0 }))
+      );
     }
     setLoading(false);
   };
@@ -160,7 +175,7 @@ const BrowseTasks = () => {
                   isRemote: task.is_remote_possible || false,
                   postedBy: "Kund",
                   postedAt: new Date(task.created_at).toLocaleDateString("sv-SE"),
-                  offersCount: 0,
+                  offersCount: task.offers_count,
                 }}
               />
             ))}

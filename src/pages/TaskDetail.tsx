@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MapPin, Calendar, Clock, Wifi, ArrowLeft, Star, MessageSquare, User, Send } from "lucide-react";
+import StatusTimeline from "@/components/StatusTimeline";
+import { MapPin, Calendar, Clock, Wifi, ArrowLeft, Star, MessageSquare, User, Send, CreditCard, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
@@ -293,9 +294,12 @@ const TaskDetail = () => {
                             <Button
                               size="sm"
                               variant="hero"
-                              onClick={() => handleAcceptOffer(offer.id, offer.tasker_user_id)}
+                              className="gap-1"
+                              asChild
                             >
-                              Acceptera bud
+                              <Link to={`/checkout/${task.id}/${offer.id}`}>
+                                <CreditCard size={13} /> Acceptera och betala
+                              </Link>
                             </Button>
                             <Button
                               size="sm"
@@ -454,6 +458,9 @@ const TaskDetail = () => {
                 </div>
               </div>
             </div>
+
+            {/* Status Timeline */}
+            <StatusTimeline currentStatus={task.status} />
           </div>
         </div>
       </div>
