@@ -193,6 +193,7 @@ export type Database = {
           is_deactivated: boolean
           name: string
           phone: string | null
+          referral_code: string | null
           updated_at: string
         }
         Insert: {
@@ -203,6 +204,7 @@ export type Database = {
           is_deactivated?: boolean
           name: string
           phone?: string | null
+          referral_code?: string | null
           updated_at?: string
         }
         Update: {
@@ -213,7 +215,38 @@ export type Database = {
           is_deactivated?: boolean
           name?: string
           phone?: string | null
+          referral_code?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_user_id: string | null
+          referrer_user_id: string
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_user_id?: string | null
+          referrer_user_id: string
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_user_id?: string | null
+          referrer_user_id?: string
+          status?: string
         }
         Relationships: []
       }

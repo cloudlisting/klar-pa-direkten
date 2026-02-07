@@ -9,6 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import StatusTimeline from "@/components/StatusTimeline";
+import TaskActions from "@/components/TaskActions";
+import ReviewForm from "@/components/ReviewForm";
+import ReviewsList from "@/components/ReviewsList";
 import { MapPin, Calendar, Clock, ArrowLeft, Star, MessageSquare, Send, CreditCard, Zap, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -37,8 +40,13 @@ const TaskDetail = () => {
     duration: "",
   });
   const [taskerProfile, setTaskerProfile] = useState<Tables<"tasker_profiles"> | null>(null);
+  const [customerProfile, setCustomerProfile] = useState<Tables<"profiles"> | null>(null);
+  const [taskerUserProfile, setTaskerUserProfile] = useState<Tables<"profiles"> | null>(null);
+  const [hasReviewed, setHasReviewed] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   const isOwner = user?.id === task?.customer_user_id;
+  const isAssignedTasker = user?.id === task?.assigned_tasker_id;
   const hasOffered = offers.some((o) => o.tasker_user_id === user?.id);
   const taskStatus = task?.status as string;
   const canInstantAccept = taskStatus === "instant_open" && 
@@ -47,6 +55,7 @@ const TaskDetail = () => {
     !isOwner &&
     !hasOffered &&
     taskerProfile?.service_area_city === task?.city;
+  const canReview = taskStatus === "paid" && !hasReviewed && user;
 
   useEffect(() => {
     fetchTask();
@@ -57,6 +66,45 @@ const TaskDetail = () => {
       fetchTaskerProfile();
     }
   }, [user, isTasker]);
+
+  useEffect(() => {
+    if (task && user && taskStatus === "paid") {
+      checkIfReviewed();
+      fetchProfilesForReview();
+    }
+  }, [task, user, taskStatus]);
+
+  const checkIfReviewed = async () => {
+    if (!user || !task) return;
+    const { data } = await supabase
+      .from("reviews")
+      .select("id")
+      .eq("task_id", task.id)
+      .eq("reviewer_user_id", user.id)
+      .maybeSingle();
+    setHasReviewed(!!data);
+  };
+
+  const fetchProfilesForReview = async () => {
+    if (!task) return;
+    // Fetch customer profile (for tasker to review)
+    const { data: custProfile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", task.customer_user_id)
+      .maybeSingle();
+    if (custProfile) setCustomerProfile(custProfile);
+
+    // Fetch assigned tasker profile (for customer to review)
+    if (task.assigned_tasker_id) {
+      const { data: taskerProf } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", task.assigned_tasker_id)
+        .maybeSingle();
+      if (taskerProf) setTaskerUserProfile(taskerProf);
+    }
+  };
 
   const fetchTaskerProfile = async () => {
     if (!user) return;
@@ -469,6 +517,58 @@ const TaskDetail = () => {
                 </Button>
               </div>
             )}
+
+            {/* Review prompt after task is paid */}
+            {canReview && !showReviewForm && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl border-2 border-warning/30 bg-warning/5 p-5"
+              >
+                <h3 className="font-semibold text-foreground mb-2">🎉 Uppdraget är klart!</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {isOwner 
+                    ? "Hur var din upplevelse med taskern? Lämna en recension för att hjälpa andra."
+                    : "Hur var din upplevelse med kunden? Lämna en recension."}
+                </p>
+                <Button variant="hero" onClick={() => setShowReviewForm(true)}>
+                  Lämna recension
+                </Button>
+              </motion.div>
+            )}
+
+            {showReviewForm && task && (
+              <>
+                {isOwner && task.assigned_tasker_id && taskerUserProfile && (
+                  <ReviewForm
+                    task={task}
+                    revieweeId={task.assigned_tasker_id}
+                    revieweeName={taskerUserProfile.name}
+                    onComplete={() => {
+                      setShowReviewForm(false);
+                      setHasReviewed(true);
+                    }}
+                  />
+                )}
+                {isAssignedTasker && customerProfile && (
+                  <ReviewForm
+                    task={task}
+                    revieweeId={task.customer_user_id}
+                    revieweeName={customerProfile.name}
+                    onComplete={() => {
+                      setShowReviewForm(false);
+                      setHasReviewed(true);
+                    }}
+                  />
+                )}
+              </>
+            )}
+
+            {hasReviewed && (
+              <div className="rounded-xl border border-success/30 bg-success/5 p-5 text-center">
+                <p className="text-success font-medium">✓ Tack för din recension!</p>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -545,6 +645,16 @@ const TaskDetail = () => {
                 </div>
               </div>
             </div>
+
+            {/* Task Actions (status progression, cancel, dispute) */}
+            {user && task && (
+              <TaskActions
+                task={task}
+                isOwner={isOwner}
+                isAssignedTasker={isAssignedTasker}
+                onUpdate={fetchTask}
+              />
+            )}
 
             {/* Status Timeline */}
             <StatusTimeline currentStatus={task.status} />
