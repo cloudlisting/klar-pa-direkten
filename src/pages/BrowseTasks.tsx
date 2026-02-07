@@ -2,7 +2,7 @@ import Layout from "@/components/Layout";
 import TaskCard from "@/components/TaskCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MOCK_CATEGORIES, SWEDISH_CITIES } from "@/lib/mock-data";
+import { CATEGORIES, SWEDISH_CITIES } from "@/lib/constants";
 import { Search, SlidersHorizontal, MapPin, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -28,7 +28,8 @@ const BrowseTasks = () => {
     const { data, error } = await supabase
       .from("tasks")
       .select("*")
-      .in("status", ["published", "in_bidding"])
+      // Using type assertion since instant_open was added to enum
+      .in("status", ["published", "instant_open", "in_bidding"] as any)
       .eq("is_hidden", false)
       .order("created_at", { ascending: false });
 
@@ -56,7 +57,7 @@ const BrowseTasks = () => {
     const matchesSearch = !search || 
       task.title.toLowerCase().includes(search.toLowerCase()) || 
       (task.description?.toLowerCase().includes(search.toLowerCase()) ?? false);
-    const matchesCategory = selectedCategory === "all" || task.category === MOCK_CATEGORIES.find(c => c.id === selectedCategory)?.name;
+    const matchesCategory = selectedCategory === "all" || task.category === CATEGORIES.find(c => c.id === selectedCategory)?.name;
     const matchesCity = selectedCity === "all" || task.city === selectedCity;
     return matchesSearch && matchesCategory && matchesCity;
   });
@@ -113,7 +114,7 @@ const BrowseTasks = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Alla kategorier</SelectItem>
-                    {MOCK_CATEGORIES.map((cat) => (
+                    {CATEGORIES.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>
                         {cat.icon} {cat.name}
                       </SelectItem>
@@ -170,9 +171,9 @@ const BrowseTasks = () => {
                   location: task.city,
                   date: task.preferred_date || "",
                   budget: task.budget_max_sek || task.budget_min_sek || 0,
-                  budgetType: task.budget_type as "fixed" | "hourly",
-                  status: "open",
-                  isRemote: task.is_remote_possible || false,
+                  budgetType: "fixed",
+                  status: (task.status as string) === "instant_open" ? "instant" : "open",
+                  isRemote: false,
                   postedBy: "Kund",
                   postedAt: new Date(task.created_at).toLocaleDateString("sv-SE"),
                   offersCount: task.offers_count,

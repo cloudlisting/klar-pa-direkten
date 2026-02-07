@@ -1,10 +1,10 @@
-import { MOCK_CATEGORIES } from "@/lib/mock-data";
+import { CATEGORIES } from "@/lib/constants";
 import { Link } from "react-router-dom";
 
 const CategoryGrid = () => {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      {MOCK_CATEGORIES.map((cat) => (
+      {CATEGORIES.map((cat) => (
         <Link
           key={cat.id}
           to={`/browse?category=${cat.id}`}
@@ -12,7 +12,6 @@ const CategoryGrid = () => {
         >
           <span className="text-3xl">{cat.icon}</span>
           <span className="text-sm font-medium text-foreground">{cat.name}</span>
-          <span className="text-xs text-muted-foreground">{cat.taskCount} uppdrag</span>
         </Link>
       ))}
     </div>
