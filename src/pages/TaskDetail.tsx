@@ -9,12 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import StatusTimeline from "@/components/StatusTimeline";
-import { MapPin, Calendar, Clock, Wifi, ArrowLeft, Star, MessageSquare, User, Send, CreditCard, CheckCircle } from "lucide-react";
+import { MapPin, Calendar, Clock, ArrowLeft, Star, MessageSquare, Send, CreditCard, Zap, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { TASK_STATUS_LABELS, calculateFees, CUSTOMER_FEE_PERCENT } from "@/lib/constants";
 import type { Tables } from "@/integrations/supabase/types";
 
-type Task = Tables<"tasks">;
+type Task = Tables<"tasks"> & { auto_accept_price_sek?: number | null };
 type Offer = Tables<"offers"> & {
   tasker_profile?: Tables<"tasker_profiles">;
   profile?: Tables<"profiles">;
@@ -28,19 +29,44 @@ const TaskDetail = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [submittingOffer, setSubmittingOffer] = useState(false);
+  const [instantAccepting, setInstantAccepting] = useState(false);
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [offerData, setOfferData] = useState({
     price: "",
     message: "",
     duration: "",
   });
+  const [taskerProfile, setTaskerProfile] = useState<Tables<"tasker_profiles"> | null>(null);
 
   const isOwner = user?.id === task?.customer_user_id;
   const hasOffered = offers.some((o) => o.tasker_user_id === user?.id);
+  const taskStatus = task?.status as string;
+  const canInstantAccept = taskStatus === "instant_open" && 
+    task?.auto_accept_price_sek && 
+    isTasker && 
+    !isOwner &&
+    !hasOffered &&
+    taskerProfile?.service_area_city === task?.city;
 
   useEffect(() => {
     fetchTask();
   }, [id]);
+
+  useEffect(() => {
+    if (user && isTasker) {
+      fetchTaskerProfile();
+    }
+  }, [user, isTasker]);
+
+  const fetchTaskerProfile = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("tasker_profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (data) setTaskerProfile(data);
+  };
 
   const fetchTask = async () => {
     if (!id) return;
@@ -56,9 +82,9 @@ const TaskDetail = () => {
       return;
     }
 
-    setTask(taskData);
+    setTask(taskData as Task);
 
-    // Fetch offers if owner
+    // Fetch offers if logged in
     if (user) {
       const { data: offersData } = await supabase
         .from("offers")
@@ -67,7 +93,6 @@ const TaskDetail = () => {
         .order("created_at", { ascending: false });
 
       if (offersData) {
-        // Fetch tasker profiles and user profiles for offers
         const taskerIds = offersData.map((o) => o.tasker_user_id);
         const [taskerProfiles, profiles] = await Promise.all([
           supabase.from("tasker_profiles").select("*").in("user_id", taskerIds),
@@ -113,36 +138,54 @@ const TaskDetail = () => {
     }
   };
 
-  const handleAcceptOffer = async (offerId: string, taskerId: string) => {
-    try {
-      // Update offer status
-      await supabase
-        .from("offers")
-        .update({ status: "accepted" })
-        .eq("id", offerId);
+  const handleInstantAccept = async () => {
+    if (!user || !task || !task.auto_accept_price_sek) return;
 
-      // Update task status and assign tasker
+    setInstantAccepting(true);
+    try {
+      // Create an offer at the auto-accept price
+      const { data: offerData, error: offerError } = await supabase
+        .from("offers")
+        .insert({
+          task_id: task.id,
+          tasker_user_id: user.id,
+          price_sek: task.auto_accept_price_sek,
+          message: "Direktbokning accepterad",
+          status: "accepted",
+        })
+        .select()
+        .single();
+
+      if (offerError) throw offerError;
+
+      // Update task to assigned
       await supabase
         .from("tasks")
-        .update({ status: "assigned", assigned_tasker_id: taskerId })
-        .eq("id", task!.id);
+        .update({
+          status: "assigned",
+          assigned_tasker_id: user.id,
+        })
+        .eq("id", task.id);
 
       // Create chat thread
       await supabase.from("chat_threads").insert({
-        task_id: task!.id,
-        customer_user_id: user!.id,
-        tasker_user_id: taskerId,
+        task_id: task.id,
+        customer_user_id: task.customer_user_id,
+        tasker_user_id: user.id,
       });
 
-      toast.success("Bud accepterat! Du kan nu chatta med taskern.");
+      toast.success("Du har accepterat uppdraget!", {
+        description: "Du kan nu chatta med kunden.",
+      });
       fetchTask();
     } catch (error: any) {
-      toast.error("Kunde inte acceptera bud");
+      toast.error(error.message || "Kunde inte acceptera");
+    } finally {
+      setInstantAccepting(false);
     }
   };
 
   const startChat = async (taskerId: string) => {
-    // Check if thread exists
     const { data: existingThread } = await supabase
       .from("chat_threads")
       .select("id")
@@ -160,21 +203,6 @@ const TaskDetail = () => {
     }
 
     navigate("/messages");
-  };
-
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      draft: "Utkast",
-      published: "Publicerad",
-      in_bidding: "Tar emot bud",
-      assigned: "Tilldelad",
-      in_progress: "Pågår",
-      completed_pending_release: "Väntar på betalning",
-      paid: "Betald",
-      cancelled: "Avbruten",
-      disputed: "Tvist",
-    };
-    return labels[status] || status;
   };
 
   if (loading) {
@@ -200,6 +228,9 @@ const TaskDetail = () => {
     );
   }
 
+  const price = task.budget_max_sek || task.budget_min_sek || 0;
+  const autoAcceptPrice = task.auto_accept_price_sek;
+
   return (
     <Layout>
       <div className="container py-8">
@@ -213,10 +244,10 @@ const TaskDetail = () => {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               <div className="flex flex-wrap gap-2 mb-3">
                 <Badge variant="secondary">{task.category}</Badge>
-                {task.is_remote_possible && (
-                  <Badge variant="muted" className="gap-1"><Wifi size={10} /> Distans möjligt</Badge>
+                {taskStatus === "instant_open" && (
+                  <Badge variant="accent" className="gap-1"><Zap size={10} /> Direktbokning</Badge>
                 )}
-                <Badge variant="success">{getStatusLabel(task.status)}</Badge>
+                <Badge variant="success">{TASK_STATUS_LABELS[task.status] || task.status}</Badge>
               </div>
               <h1 className="text-2xl font-bold font-display text-foreground mb-4">
                 {task.title}
@@ -237,6 +268,42 @@ const TaskDetail = () => {
                 </p>
               </div>
             </motion.div>
+
+            {/* Instant Accept for Taskers */}
+            {canInstantAccept && autoAcceptPrice && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl border-2 border-accent bg-accent/5 p-6"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-accent/20 flex items-center justify-center">
+                    <Zap className="text-accent" size={24} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-foreground mb-1">Direktbokning tillgänglig!</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Acceptera detta uppdrag direkt för {autoAcceptPrice.toLocaleString("sv-SE")} kr. 
+                      Du får {calculateFees(autoAcceptPrice).totalTaskerPayout.toLocaleString("sv-SE")} kr efter avgift.
+                    </p>
+                    <Button 
+                      variant="accent" 
+                      size="lg" 
+                      className="gap-2"
+                      onClick={handleInstantAccept}
+                      disabled={instantAccepting}
+                    >
+                      {instantAccepting ? "Accepterar..." : (
+                        <>
+                          <CheckCircle size={18} />
+                          Acceptera nu för {autoAcceptPrice.toLocaleString("sv-SE")} kr
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
             {/* Offers section */}
             {(isOwner || hasOffered) && (
@@ -331,22 +398,27 @@ const TaskDetail = () => {
             )}
 
             {/* Offer form for taskers */}
-            {!isOwner && isTasker && !hasOffered && task.status === "published" && (
+            {!isOwner && isTasker && !hasOffered && (taskStatus === "published" || taskStatus === "instant_open") && (
               <div className="rounded-xl border border-border bg-card p-5">
                 {showOfferForm ? (
                   <form onSubmit={handleSubmitOffer} className="space-y-4">
                     <h3 className="font-semibold text-foreground mb-2">Skicka ett bud</h3>
                     <div>
-                      <Label htmlFor="price">Pris (SEK) *</Label>
+                      <Label htmlFor="price">Ditt pris (SEK) *</Label>
                       <Input
                         id="price"
                         type="number"
-                        placeholder={task.budget_max_sek?.toString() || "1000"}
+                        placeholder={price.toString()}
                         value={offerData.price}
                         onChange={(e) => setOfferData({ ...offerData, price: e.target.value })}
                         className="mt-1.5"
                         required
                       />
+                      {offerData.price && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Du får {calculateFees(parseInt(offerData.price)).totalTaskerPayout.toLocaleString("sv-SE")} kr efter avgift
+                        </p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="duration">Uppskattad tid</Label>
@@ -381,8 +453,8 @@ const TaskDetail = () => {
                 ) : (
                   <div className="text-center">
                     <p className="text-muted-foreground mb-3">Intresserad av detta uppdrag?</p>
-                    <Button variant="hero" onClick={() => setShowOfferForm(true)}>
-                      Lägg ett bud
+                    <Button variant="outline" onClick={() => setShowOfferForm(true)}>
+                      Lägg ett eget bud
                     </Button>
                   </div>
                 )}
@@ -404,14 +476,16 @@ const TaskDetail = () => {
             <div className="rounded-xl border border-border bg-card p-5 shadow-card sticky top-24">
               <div className="text-center mb-4">
                 <p className="text-3xl font-bold text-foreground">
-                  {task.budget_min_sek && task.budget_max_sek
-                    ? `${task.budget_min_sek.toLocaleString("sv-SE")} - ${task.budget_max_sek.toLocaleString("sv-SE")}`
-                    : (task.budget_max_sek || task.budget_min_sek || 0).toLocaleString("sv-SE")
-                  } kr
+                  {price.toLocaleString("sv-SE")} kr
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  {task.budget_type === "fixed" ? "Fast pris" : "Per timme"}
-                </p>
+                <p className="text-sm text-muted-foreground">Fast pris</p>
+                
+                {autoAcceptPrice && taskStatus === "instant_open" && (
+                  <div className="mt-2 inline-flex items-center gap-1 text-sm text-accent font-medium">
+                    <Zap size={14} />
+                    Direktbokning: {autoAcceptPrice.toLocaleString("sv-SE")} kr
+                  </div>
+                )}
               </div>
 
               {!user && (
@@ -420,7 +494,20 @@ const TaskDetail = () => {
                 </Button>
               )}
 
-              {user && !isOwner && isTasker && !hasOffered && task.status === "published" && (
+              {canInstantAccept && autoAcceptPrice && (
+                <Button
+                  variant="accent"
+                  size="lg"
+                  className="w-full mb-3 gap-2"
+                  onClick={handleInstantAccept}
+                  disabled={instantAccepting}
+                >
+                  <Zap size={16} />
+                  Acceptera direkt
+                </Button>
+              )}
+
+              {user && !isOwner && isTasker && !hasOffered && !canInstantAccept && (taskStatus === "published" || taskStatus === "instant_open") && (
                 <Button
                   variant="hero"
                   size="lg"

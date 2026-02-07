@@ -132,6 +132,7 @@ export type Database = {
         Row: {
           amount_sek: number
           created_at: string
+          customer_fee_sek: number
           id: string
           payee_user_id: string
           payer_user_id: string
@@ -140,11 +141,13 @@ export type Database = {
           provider_reference_id: string | null
           status: Database["public"]["Enums"]["payment_status"]
           task_id: string
+          tasker_fee_sek: number
           updated_at: string
         }
         Insert: {
           amount_sek: number
           created_at?: string
+          customer_fee_sek?: number
           id?: string
           payee_user_id: string
           payer_user_id: string
@@ -153,11 +156,13 @@ export type Database = {
           provider_reference_id?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
           task_id: string
+          tasker_fee_sek?: number
           updated_at?: string
         }
         Update: {
           amount_sek?: number
           created_at?: string
+          customer_fee_sek?: number
           id?: string
           payee_user_id?: string
           payer_user_id?: string
@@ -166,6 +171,7 @@ export type Database = {
           provider_reference_id?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
           task_id?: string
+          tasker_fee_sek?: number
           updated_at?: string
         }
         Relationships: [
@@ -363,6 +369,7 @@ export type Database = {
         Row: {
           address_optional: string | null
           assigned_tasker_id: string | null
+          auto_accept_price_sek: number | null
           budget_max_sek: number | null
           budget_min_sek: number | null
           budget_type: Database["public"]["Enums"]["budget_type"]
@@ -383,6 +390,7 @@ export type Database = {
         Insert: {
           address_optional?: string | null
           assigned_tasker_id?: string | null
+          auto_accept_price_sek?: number | null
           budget_max_sek?: number | null
           budget_min_sek?: number | null
           budget_type?: Database["public"]["Enums"]["budget_type"]
@@ -403,6 +411,7 @@ export type Database = {
         Update: {
           address_optional?: string | null
           assigned_tasker_id?: string | null
+          auto_accept_price_sek?: number | null
           budget_max_sek?: number | null
           budget_min_sek?: number | null
           budget_type?: Database["public"]["Enums"]["budget_type"]
@@ -457,6 +466,10 @@ export type Database = {
       can_view_task: { Args: { check_task_id: string }; Returns: boolean }
       is_admin: { Args: { check_user_id: string }; Returns: boolean }
       is_tasker: { Args: { check_user_id: string }; Returns: boolean }
+      tasker_can_instant_accept: {
+        Args: { p_task_id: string; p_tasker_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "customer" | "tasker"

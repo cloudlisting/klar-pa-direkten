@@ -9,13 +9,12 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Shield, Lock, CheckCircle, AlertCircle, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { calculateFees, CUSTOMER_FEE_PERCENT, TASKER_FEE_PERCENT } from "@/lib/constants";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Task = Tables<"tasks">;
 type Offer = Tables<"offers">;
 type Profile = Tables<"profiles">;
-
-const PLATFORM_FEE_PERCENT = 0.10; // 10% platform fee
 
 const Checkout = () => {
   const { taskId, offerId } = useParams();
@@ -96,31 +95,24 @@ const Checkout = () => {
     }
   };
 
-  const calculateFees = () => {
-    if (!offer) return { subtotal: 0, platformFee: 0, total: 0 };
-    const subtotal = offer.price_sek;
-    const platformFee = Math.round(subtotal * PLATFORM_FEE_PERCENT);
-    const total = subtotal + platformFee;
-    return { subtotal, platformFee, total };
-  };
-
   const handleConfirmPayment = async () => {
     if (!task || !offer || !user) return;
 
     setProcessing(true);
     try {
-      const { subtotal, platformFee, total } = calculateFees();
+      const fees = calculateFees(offer.price_sek);
 
-      // Create payment record
+      // Create payment record with two-sided fees
       const { error: paymentError } = await supabase.from("payments").insert({
         task_id: task.id,
         payer_user_id: user.id,
         payee_user_id: offer.tasker_user_id,
-        amount_sek: subtotal,
-        platform_fee_sek: platformFee,
-        status: "held_in_escrow",
+        amount_sek: fees.taskPrice,
+        platform_fee_sek: fees.customerFee + fees.taskerFee, // Total platform revenue
+        status: "held_in_escrow" as const,
         provider: "stripe",
-      });
+        // customer_fee_sek and tasker_fee_sek available after types regenerate
+      } as any);
 
       if (paymentError) throw paymentError;
 
@@ -201,7 +193,7 @@ const Checkout = () => {
     );
   }
 
-  const { subtotal, platformFee, total } = calculateFees();
+  const fees = calculateFees(offer.price_sek);
 
   return (
     <Layout>
@@ -254,30 +246,39 @@ const Checkout = () => {
 
             <Separator className="my-6" />
 
-            {/* Price breakdown */}
+            {/* Price breakdown - Two-sided fees */}
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Taskers pris</span>
+                <span className="text-muted-foreground">Uppdraget</span>
                 <span className="text-foreground font-medium">
-                  {subtotal.toLocaleString("sv-SE")} kr
+                  {fees.taskPrice.toLocaleString("sv-SE")} kr
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground flex items-center gap-1">
-                  Plattformsavgift (10%)
-                  <span className="text-xs">(serviceavgift)</span>
+                  Serviceavgift ({Math.round(CUSTOMER_FEE_PERCENT * 100)}%)
                 </span>
                 <span className="text-foreground font-medium">
-                  {platformFee.toLocaleString("sv-SE")} kr
+                  {fees.customerFee.toLocaleString("sv-SE")} kr
                 </span>
               </div>
               <Separator />
               <div className="flex justify-between text-lg">
-                <span className="font-semibold text-foreground">Totalt</span>
+                <span className="font-semibold text-foreground">Totalt att betala</span>
                 <span className="font-bold text-foreground">
-                  {total.toLocaleString("sv-SE")} kr
+                  {fees.totalCustomerCharge.toLocaleString("sv-SE")} kr
                 </span>
               </div>
+            </div>
+
+            {/* Tasker payout info */}
+            <div className="rounded-lg bg-muted/50 p-4 mb-6 text-sm">
+              <p className="text-muted-foreground">
+                <strong>Tasker får:</strong> {fees.totalTaskerPayout.toLocaleString("sv-SE")} kr 
+                <span className="text-xs ml-1">
+                  (efter {Math.round(TASKER_FEE_PERCENT * 100)}% plattformsavgift)
+                </span>
+              </p>
             </div>
 
             {/* Escrow info */}
@@ -306,7 +307,7 @@ const Checkout = () => {
               ) : (
                 <>
                   <CreditCard size={18} />
-                  Bekräfta och betala {total.toLocaleString("sv-SE")} kr
+                  Bekräfta och betala {fees.totalCustomerCharge.toLocaleString("sv-SE")} kr
                 </>
               )}
             </Button>

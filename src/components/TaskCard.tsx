@@ -1,10 +1,23 @@
 import { Link } from "react-router-dom";
-import { MapPin, Clock, MessageSquare, Wifi } from "lucide-react";
+import { MapPin, Clock, MessageSquare, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import type { Task } from "@/lib/mock-data";
 
 interface TaskCardProps {
-  task: Task;
+  task: {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    location: string;
+    date: string;
+    budget: number;
+    budgetType: "fixed";
+    status: "open" | "instant" | "assigned" | "in_progress" | "completed" | "cancelled";
+    isRemote: boolean;
+    postedBy: string;
+    postedAt: string;
+    offersCount: number;
+  };
 }
 
 const TaskCard = ({ task }: TaskCardProps) => {
@@ -19,14 +32,14 @@ const TaskCard = ({ task }: TaskCardProps) => {
             <Badge variant="secondary" className="text-xs">
               {task.category}
             </Badge>
-            {task.isRemote && (
-              <Badge variant="muted" className="text-xs gap-1">
-                <Wifi size={10} />
-                Distans
+            {task.status === "instant" && (
+              <Badge variant="accent" className="text-xs gap-1">
+                <Zap size={10} />
+                Direkt
               </Badge>
             )}
-            <Badge variant={task.status === "open" ? "success" : "muted"} className="text-xs">
-              {task.status === "open" ? "Öppen" : task.status}
+            <Badge variant={task.status === "open" || task.status === "instant" ? "success" : "muted"} className="text-xs">
+              {task.status === "open" || task.status === "instant" ? "Öppen" : task.status}
             </Badge>
           </div>
           <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
@@ -40,9 +53,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
           <p className="text-lg font-bold text-foreground">
             {task.budget.toLocaleString("sv-SE")} kr
           </p>
-          <p className="text-xs text-muted-foreground">
-            {task.budgetType === "fixed" ? "fast pris" : "per timme"}
-          </p>
+          <p className="text-xs text-muted-foreground">fast pris</p>
         </div>
       </div>
 
