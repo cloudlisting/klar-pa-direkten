@@ -67,6 +67,12 @@ const Header = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/messages" className="flex items-center gap-2">
+                    <MessageSquare size={14} />
+                    Meddelanden
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/settings" className="flex items-center gap-2">
                     <Settings size={14} />
                     Inställningar
