@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 import { CheckCircle, ArrowRight, X } from "lucide-react";
 
 const BecomeTasker = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isTasker, refreshTaskerStatus } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
