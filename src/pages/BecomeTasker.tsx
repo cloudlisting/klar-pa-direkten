@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 import { CheckCircle, ArrowRight, X } from "lucide-react";
 
 const BecomeTasker = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isTasker, refreshTaskerStatus } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
@@ -61,6 +61,7 @@ const BecomeTasker = () => {
       if (error) throw error;
 
       toast.success("Du är nu registrerad som tasker!");
+      await refreshTaskerStatus();
       navigate("/tasker-dashboard");
     } catch (error: any) {
       toast.error(error.message || "Något gick fel");
@@ -74,6 +75,24 @@ const BecomeTasker = () => {
       <Layout>
         <div className="container py-16 text-center">
           <p className="text-muted-foreground">Laddar...</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (isTasker) {
+    return (
+      <Layout>
+        <div className="container max-w-lg py-16 text-center">
+          <h1 className="text-2xl font-bold font-display text-foreground mb-4">
+            Du är redan tasker!
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            Du har redan registrerat dig som tasker. Gå till din dashboard för att hantera uppdrag.
+          </p>
+          <Button variant="hero" size="lg" onClick={() => navigate("/tasker-dashboard")}>
+            Gå till Tasker Dashboard
+          </Button>
         </div>
       </Layout>
     );

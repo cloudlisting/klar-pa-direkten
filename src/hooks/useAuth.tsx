@@ -9,6 +9,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isTasker: boolean;
   signOut: () => Promise<void>;
+  refreshTaskerStatus: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -71,6 +72,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const refreshTaskerStatus = async () => {
+    if (!user) return;
+    const { data: taskerProfile } = await supabase
+      .from("tasker_profiles")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    setIsTasker(!!taskerProfile);
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -80,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAdmin, isTasker, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isAdmin, isTasker, signOut, refreshTaskerStatus }}>
       {children}
     </AuthContext.Provider>
   );
