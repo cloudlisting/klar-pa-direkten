@@ -61,6 +61,7 @@ const BecomeTasker = () => {
       if (error) throw error;
 
       toast.success("Du är nu registrerad som tasker!");
+      await refreshTaskerStatus();
       navigate("/tasker-dashboard");
     } catch (error: any) {
       toast.error(error.message || "Något gick fel");
