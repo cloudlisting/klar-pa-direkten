@@ -234,23 +234,35 @@ const TaskDetail = () => {
   };
 
   const startChat = async (taskerId: string) => {
+    if (!task || !user) return;
+    
+    const customerId = isOwner ? user.id : task.customer_user_id;
+    const taskerUserId = isOwner ? taskerId : user.id;
+
     const { data: existingThread } = await supabase
       .from("chat_threads")
       .select("id")
-      .eq("task_id", task!.id)
-      .eq("customer_user_id", isOwner ? user!.id : taskerId)
-      .eq("tasker_user_id", isOwner ? taskerId : user!.id)
+      .eq("task_id", task.id)
+      .eq("customer_user_id", customerId)
+      .eq("tasker_user_id", taskerUserId)
       .maybeSingle();
 
-    if (!existingThread) {
-      await supabase.from("chat_threads").insert({
-        task_id: task!.id,
-        customer_user_id: isOwner ? user!.id : taskerId,
-        tasker_user_id: isOwner ? taskerId : user!.id,
-      });
+    let threadId = existingThread?.id;
+
+    if (!threadId) {
+      const { data: newThread } = await supabase
+        .from("chat_threads")
+        .insert({
+          task_id: task.id,
+          customer_user_id: customerId,
+          tasker_user_id: taskerUserId,
+        })
+        .select("id")
+        .single();
+      threadId = newThread?.id;
     }
 
-    navigate("/messages");
+    navigate(`/messages${threadId ? `?thread=${threadId}` : ""}`);
   };
 
   if (loading) {
