@@ -80,6 +80,24 @@ const BecomeTasker = () => {
     );
   }
 
+  if (isTasker) {
+    return (
+      <Layout>
+        <div className="container max-w-lg py-16 text-center">
+          <h1 className="text-2xl font-bold font-display text-foreground mb-4">
+            Du är redan tasker!
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            Du har redan registrerat dig som tasker. Gå till din dashboard för att hantera uppdrag.
+          </p>
+          <Button variant="hero" size="lg" onClick={() => navigate("/tasker-dashboard")}>
+            Gå till Tasker Dashboard
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
+
   if (!user) {
     return (
       <Layout>
