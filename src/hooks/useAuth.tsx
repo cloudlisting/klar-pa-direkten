@@ -71,6 +71,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const refreshTaskerStatus = async () => {
+    if (!user) return;
+    const { data: taskerProfile } = await supabase
+      .from("tasker_profiles")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    setIsTasker(!!taskerProfile);
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
