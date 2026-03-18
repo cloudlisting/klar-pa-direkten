@@ -509,6 +509,20 @@ const TaskDetail = () => {
               </div>
             )}
 
+            {/* Message button for taskers who want to ask questions before bidding */}
+            {!isOwner && isTasker && user && (taskStatus === "published" || taskStatus === "instant_open") && (
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => startChat(user.id)}
+                >
+                  <MessageSquare size={16} />
+                  Skicka meddelande till kunden
+                </Button>
+              </div>
+            )}
+
             {!isOwner && !isTasker && user && (
               <div className="rounded-xl border border-border bg-card p-5 text-center">
                 <p className="text-muted-foreground mb-3">Vill du lägga bud på uppdrag?</p>
