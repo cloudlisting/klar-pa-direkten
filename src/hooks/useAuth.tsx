@@ -9,6 +9,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isTasker: boolean;
   signOut: () => Promise<void>;
+  refreshTaskerStatus: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
