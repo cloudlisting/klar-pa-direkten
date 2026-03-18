@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut, Settings, LayoutDashboard, Shield } from "lucide-react";
+import { Menu, X, User, LogOut, Settings, LayoutDashboard, Shield, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,6 +64,12 @@ const Header = () => {
                   <Link to="/dashboard" className="flex items-center gap-2">
                     <LayoutDashboard size={14} />
                     Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/messages" className="flex items-center gap-2">
+                    <MessageSquare size={14} />
+                    Meddelanden
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

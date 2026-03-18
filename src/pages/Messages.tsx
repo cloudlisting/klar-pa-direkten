@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Send } from "lucide-react";
+import { MessageSquare, Send, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -18,12 +18,14 @@ type ChatMessage = Tables<"chat_messages">;
 const Messages = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [selectedThread, setSelectedThread] = useState<ChatThread | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loadingThreads, setLoadingThreads] = useState(true);
   const [profiles, setProfiles] = useState<Record<string, Tables<"profiles">>>({});
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -37,11 +39,19 @@ const Messages = () => {
     }
   }, [user]);
 
+  // Auto-select thread from URL param
+  useEffect(() => {
+    const threadId = searchParams.get("thread");
+    if (threadId && threads.length > 0 && !selectedThread) {
+      const thread = threads.find((t) => t.id === threadId);
+      if (thread) setSelectedThread(thread);
+    }
+  }, [searchParams, threads]);
+
   useEffect(() => {
     if (selectedThread) {
       fetchMessages(selectedThread.id);
-      
-      // Subscribe to realtime messages
+
       const channel = supabase
         .channel(`messages-${selectedThread.id}`)
         .on(
@@ -64,6 +74,11 @@ const Messages = () => {
     }
   }, [selectedThread]);
 
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const fetchThreads = async () => {
     const { data, error } = await supabase
       .from("chat_threads")
@@ -73,19 +88,18 @@ const Messages = () => {
 
     if (!error && data) {
       setThreads(data as ChatThread[]);
-      
-      // Fetch profiles for all users in threads
+
       const userIds = new Set<string>();
       data.forEach((t) => {
         userIds.add(t.customer_user_id);
         userIds.add(t.tasker_user_id);
       });
-      
+
       const { data: profilesData } = await supabase
         .from("profiles")
         .select("*")
         .in("id", Array.from(userIds));
-      
+
       if (profilesData) {
         const profileMap: Record<string, Tables<"profiles">> = {};
         profilesData.forEach((p) => (profileMap[p.id] = p));
@@ -101,7 +115,7 @@ const Messages = () => {
       .select("*")
       .eq("thread_id", threadId)
       .order("created_at", { ascending: true });
-    
+
     if (data) setMessages(data);
   };
 
@@ -135,8 +149,8 @@ const Messages = () => {
   return (
     <Layout hideFooter>
       <div className="flex h-[calc(100vh-64px)]">
-        {/* Thread list */}
-        <div className="w-80 border-r border-border bg-card flex flex-col">
+        {/* Thread list - hidden on mobile when a thread is selected */}
+        <div className={`w-full md:w-80 border-r border-border bg-card flex flex-col ${selectedThread ? "hidden md:flex" : "flex"}`}>
           <div className="p-4 border-b border-border">
             <h1 className="font-semibold text-foreground">Meddelanden</h1>
           </div>
@@ -147,6 +161,9 @@ const Messages = () => {
               <div className="p-4 text-center">
                 <MessageSquare className="mx-auto text-muted-foreground mb-2" size={32} />
                 <p className="text-sm text-muted-foreground">Inga konversationer ännu</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Starta en chatt genom att skicka ett meddelande från ett uppdrag.
+                </p>
               </div>
             ) : (
               threads.map((thread) => {
@@ -159,12 +176,19 @@ const Messages = () => {
                       selectedThread?.id === thread.id ? "bg-secondary" : ""
                     }`}
                   >
-                    <p className="font-medium text-foreground truncate">
-                      {otherUser?.name || "Användare"}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">
-                      {(thread as any).task?.title || "Uppdrag"}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center font-semibold text-foreground shrink-0">
+                        {otherUser?.name?.charAt(0) || "?"}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground truncate">
+                          {otherUser?.name || "Användare"}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {(thread as any).task?.title || "Uppdrag"}
+                        </p>
+                      </div>
+                    </div>
                   </button>
                 );
               })
@@ -172,19 +196,34 @@ const Messages = () => {
           </div>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 flex flex-col">
+        {/* Messages area */}
+        <div className={`flex-1 flex flex-col ${selectedThread ? "flex" : "hidden md:flex"}`}>
           {selectedThread ? (
             <>
-              <div className="p-4 border-b border-border bg-card">
-                <p className="font-medium text-foreground">
-                  {profiles[getOtherUserId(selectedThread)]?.name || "Användare"}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {(selectedThread as any).task?.title}
-                </p>
+              <div className="p-4 border-b border-border bg-card flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden shrink-0"
+                  onClick={() => setSelectedThread(null)}
+                >
+                  <ArrowLeft size={18} />
+                </Button>
+                <div className="min-w-0">
+                  <p className="font-medium text-foreground truncate">
+                    {profiles[getOtherUserId(selectedThread)]?.name || "Användare"}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {(selectedThread as any).task?.title}
+                  </p>
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {messages.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-muted-foreground">Inga meddelanden ännu. Skriv det första!</p>
+                  </div>
+                )}
                 {messages.map((msg) => (
                   <motion.div
                     key={msg.id}
@@ -193,27 +232,29 @@ const Messages = () => {
                     className={`flex ${msg.sender_user_id === user?.id ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-xs rounded-xl px-4 py-2 ${
+                      className={`max-w-[75%] rounded-xl px-4 py-2 ${
                         msg.sender_user_id === user?.id
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary text-secondary-foreground"
                       }`}
                     >
-                      <p className="text-sm">{msg.body}</p>
+                      <p className="text-sm whitespace-pre-wrap break-words">{msg.body}</p>
                       <p className="text-xs opacity-70 mt-1">
                         {new Date(msg.created_at).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                   </motion.div>
                 ))}
+                <div ref={messagesEndRef} />
               </div>
               <form onSubmit={sendMessage} className="p-4 border-t border-border bg-card flex gap-2">
                 <Input
                   placeholder="Skriv ett meddelande..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
+                  autoFocus
                 />
-                <Button type="submit" variant="hero" size="icon">
+                <Button type="submit" variant="hero" size="icon" disabled={!newMessage.trim()}>
                   <Send size={18} />
                 </Button>
               </form>
