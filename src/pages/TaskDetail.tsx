@@ -235,34 +235,54 @@ const TaskDetail = () => {
 
   const startChat = async (taskerId: string) => {
     if (!task || !user) return;
-    
+
     const customerId = isOwner ? user.id : task.customer_user_id;
     const taskerUserId = isOwner ? taskerId : user.id;
 
-    const { data: existingThread } = await supabase
-      .from("chat_threads")
-      .select("id")
-      .eq("task_id", task.id)
-      .eq("customer_user_id", customerId)
-      .eq("tasker_user_id", taskerUserId)
-      .maybeSingle();
-
-    let threadId = existingThread?.id;
-
-    if (!threadId) {
-      const { data: newThread } = await supabase
+    try {
+      const { data: existingThread, error: lookupError } = await supabase
         .from("chat_threads")
-        .insert({
-          task_id: task.id,
-          customer_user_id: customerId,
-          tasker_user_id: taskerUserId,
-        })
         .select("id")
-        .single();
-      threadId = newThread?.id;
-    }
+        .eq("task_id", task.id)
+        .eq("customer_user_id", customerId)
+        .eq("tasker_user_id", taskerUserId)
+        .maybeSingle();
 
-    navigate(`/messages${threadId ? `?thread=${threadId}` : ""}`);
+      if (lookupError) {
+        console.error("Thread lookup failed:", lookupError);
+        toast.error("Kunde inte hämta konversation: " + lookupError.message);
+        return;
+      }
+
+      let threadId = existingThread?.id;
+
+      if (!threadId) {
+        const { data: newThread, error: insertError } = await supabase
+          .from("chat_threads")
+          .insert({
+            task_id: task.id,
+            customer_user_id: customerId,
+            tasker_user_id: taskerUserId,
+          })
+          .select("id")
+          .single();
+
+        if (insertError || !newThread) {
+          console.error("Thread create failed:", insertError);
+          toast.error(
+            "Kunde inte starta chatt: " + (insertError?.message || "okänt fel")
+          );
+          return;
+        }
+        threadId = newThread.id;
+      }
+
+      toast.success("Chatt öppnad");
+      navigate(`/messages?thread=${threadId}`);
+    } catch (err: any) {
+      console.error("startChat error:", err);
+      toast.error("Något gick fel: " + (err?.message || "okänt fel"));
+    }
   };
 
   if (loading) {
