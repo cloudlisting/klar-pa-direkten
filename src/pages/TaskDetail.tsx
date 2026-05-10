@@ -357,6 +357,23 @@ const TaskDetail = () => {
                   {task.description || "Ingen beskrivning angiven."}
                 </p>
               </div>
+
+              {customerProfile && (
+                <div className="rounded-xl border border-border bg-card p-5 mt-4">
+                  <h3 className="font-semibold text-foreground mb-3">Postad av</h3>
+                  <TrustProfileCard
+                    userId={customerProfile.id}
+                    name={customerProfile.name}
+                    avatarUrl={customerProfile.avatar_url}
+                    trust={customerProfile}
+                    subtitle={
+                      customerProfile.rating_count
+                        ? `${customerProfile.rating_count} recensioner`
+                        : "Ny på Taskly"
+                    }
+                  />
+                </div>
+              )}
             </motion.div>
 
             {/* Instant Accept for Taskers */}
