@@ -416,25 +416,19 @@ const TaskDetail = () => {
                         transition={{ delay: i * 0.1 }}
                       >
                         <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center font-semibold text-foreground">
-                              {offer.profile?.name?.charAt(0) || "?"}
-                            </div>
-                            <div>
-                              <p className="font-semibold text-foreground">{offer.profile?.name || "Tasker"}</p>
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-0.5">
-                                  <Star size={11} className="text-warning fill-warning" />
-                                  {offer.tasker_profile?.avg_rating || "0"}
-                                </span>
-                                <span>({offer.tasker_profile?.completed_tasks_count || 0} uppdrag)</span>
-                                {offer.status === "accepted" && (
-                                  <Badge variant="success" className="text-xs">Accepterad</Badge>
-                                )}
-                              </div>
-                            </div>
+                          <div className="flex-1 min-w-0">
+                            <TrustProfileCard
+                              userId={offer.tasker_user_id}
+                              name={offer.profile?.name || "Tasker"}
+                              avatarUrl={offer.profile?.avatar_url}
+                              trust={offer.profile || {}}
+                              subtitle={offer.tasker_profile?.service_area_city || undefined}
+                            />
+                            {offer.status === "accepted" && (
+                              <Badge variant="success" className="text-xs mt-2">Accepterad</Badge>
+                            )}
                           </div>
-                          <div className="text-right">
+                          <div className="text-right shrink-0">
                             <p className="text-lg font-bold text-foreground">
                               {offer.price_sek.toLocaleString("sv-SE")} kr
                             </p>
