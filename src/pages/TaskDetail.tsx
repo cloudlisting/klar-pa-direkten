@@ -12,6 +12,8 @@ import StatusTimeline from "@/components/StatusTimeline";
 import TaskActions from "@/components/TaskActions";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewsList from "@/components/ReviewsList";
+import TrustProfileCard from "@/components/TrustProfileCard";
+import TrustBadges from "@/components/TrustBadges";
 import { MapPin, Calendar, Clock, ArrowLeft, Star, MessageSquare, Send, CreditCard, Zap, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -131,6 +133,14 @@ const TaskDetail = () => {
     }
 
     setTask(taskData as Task);
+
+    // Always fetch customer profile for trust display
+    const { data: custProfile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", taskData.customer_user_id)
+      .maybeSingle();
+    if (custProfile) setCustomerProfile(custProfile);
 
     // Fetch offers if logged in
     if (user) {
