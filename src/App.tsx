@@ -20,6 +20,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Checkout from "./pages/Checkout";
 import CategoryPage from "./pages/CategoryPage";
 import CityPage from "./pages/CityPage";
+import PublicProfile from "./pages/PublicProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
             {/* SEO Routes */}
             <Route path="/kategorier/:slug" element={<CategoryPage />} />
             <Route path="/stad/:slug" element={<CityPage />} />
+            <Route path="/profile/:userId" element={<PublicProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
