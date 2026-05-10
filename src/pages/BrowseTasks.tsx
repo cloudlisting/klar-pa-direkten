@@ -10,7 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Task = Tables<"tasks">;
-type TaskWithOffers = Task & { offers_count: number };
+type Profile = Tables<"profiles">;
+type TaskWithOffers = Task & { offers_count: number; poster?: Profile };
 
 const BrowseTasks = () => {
   const [search, setSearch] = useState("");
@@ -34,20 +35,26 @@ const BrowseTasks = () => {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      // Fetch offer counts for all tasks
       const taskIds = data.map((t) => t.id);
-      const { data: offerCounts } = await supabase
-        .from("offers")
-        .select("task_id")
-        .in("task_id", taskIds);
+      const customerIds = Array.from(new Set(data.map((t) => t.customer_user_id)));
+      const [{ data: offerCounts }, { data: posters }] = await Promise.all([
+        supabase.from("offers").select("task_id").in("task_id", taskIds),
+        supabase.from("profiles").select("*").in("id", customerIds),
+      ]);
 
       const countsMap: Record<string, number> = {};
       offerCounts?.forEach((o) => {
         countsMap[o.task_id] = (countsMap[o.task_id] || 0) + 1;
       });
+      const posterMap: Record<string, Profile> = {};
+      posters?.forEach((p) => (posterMap[p.id] = p));
 
       setTasks(
-        data.map((t) => ({ ...t, offers_count: countsMap[t.id] || 0 }))
+        data.map((t) => ({
+          ...t,
+          offers_count: countsMap[t.id] || 0,
+          poster: posterMap[t.customer_user_id],
+        }))
       );
     }
     setLoading(false);
@@ -174,9 +181,21 @@ const BrowseTasks = () => {
                   budgetType: "fixed",
                   status: (task.status as string) === "instant_open" ? "instant" : "open",
                   isRemote: false,
-                  postedBy: "Kund",
+                  postedBy: task.poster?.name || "Kund",
                   postedAt: new Date(task.created_at).toLocaleDateString("sv-SE"),
                   offersCount: task.offers_count,
+                  posterTrust: task.poster
+                    ? {
+                        rating_avg: task.poster.rating_avg,
+                        rating_count: task.poster.rating_count,
+                        completed_tasks: task.poster.completed_tasks,
+                        completion_rate: task.poster.completion_rate,
+                        bankid_verified: task.poster.bankid_verified,
+                        id_verified: task.poster.id_verified,
+                        phone_verified: task.poster.phone_verified,
+                        email_verified: task.poster.email_verified,
+                      }
+                    : undefined,
                 }}
               />
             ))}
