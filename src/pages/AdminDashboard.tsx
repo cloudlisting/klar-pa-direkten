@@ -6,13 +6,16 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, ClipboardList, Flag, AlertTriangle, BarChart3 } from "lucide-react";
+import { Users, ClipboardList, Flag, AlertTriangle, Star, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import TrustBadges from "@/components/TrustBadges";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
 type Task = Tables<"tasks">;
 type Report = Tables<"reports">;
+type Review = Tables<"reviews">;
 
 const AdminDashboard = () => {
   const { user, loading, isAdmin } = useAuth();
@@ -20,6 +23,7 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState<Profile[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -37,16 +41,48 @@ const AdminDashboard = () => {
   }, [user, isAdmin]);
 
   const fetchData = async () => {
-    const [usersRes, tasksRes, reportsRes] = await Promise.all([
+    const [usersRes, tasksRes, reportsRes, reviewsRes] = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(50),
       supabase.from("tasks").select("*").order("created_at", { ascending: false }).limit(50),
       supabase.from("reports").select("*").order("created_at", { ascending: false }),
+      supabase.from("reviews").select("*").order("created_at", { ascending: false }).limit(50),
     ]);
 
     if (usersRes.data) setUsers(usersRes.data);
     if (tasksRes.data) setTasks(tasksRes.data);
     if (reportsRes.data) setReports(reportsRes.data);
+    if (reviewsRes.data) setReviews(reviewsRes.data);
     setLoadingData(false);
+  };
+
+  const toggleVerification = async (
+    userId: string,
+    field: "bankid_verified" | "id_verified" | "phone_verified" | "email_verified",
+    value: boolean
+  ) => {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ [field]: !value })
+      .eq("id", userId);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Verifiering uppdaterad");
+      fetchData();
+    }
+  };
+
+  const toggleReviewHidden = async (reviewId: string, current: boolean) => {
+    const { error } = await supabase
+      .from("reviews")
+      .update({ is_hidden: !current })
+      .eq("id", reviewId);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(current ? "Recension visas igen" : "Recension dold");
+      fetchData();
+    }
   };
 
   const toggleUserDeactivation = async (userId: string, currentStatus: boolean) => {
