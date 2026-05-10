@@ -187,35 +187,68 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bankid_verified: boolean
+          bio: string | null
+          cancelled_tasks: number
+          completed_tasks: number
+          completion_rate: number
           created_at: string
           email: string
+          email_verified: boolean
           id: string
+          id_verified: boolean
           is_deactivated: boolean
           name: string
           phone: string | null
+          phone_verified: boolean
+          rating_avg: number
+          rating_count: number
           referral_code: string | null
+          response_time_minutes: number | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          bankid_verified?: boolean
+          bio?: string | null
+          cancelled_tasks?: number
+          completed_tasks?: number
+          completion_rate?: number
           created_at?: string
           email: string
+          email_verified?: boolean
           id: string
+          id_verified?: boolean
           is_deactivated?: boolean
           name: string
           phone?: string | null
+          phone_verified?: boolean
+          rating_avg?: number
+          rating_count?: number
           referral_code?: string | null
+          response_time_minutes?: number | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          bankid_verified?: boolean
+          bio?: string | null
+          cancelled_tasks?: number
+          completed_tasks?: number
+          completion_rate?: number
           created_at?: string
           email?: string
+          email_verified?: boolean
           id?: string
+          id_verified?: boolean
           is_deactivated?: boolean
           name?: string
           phone?: string | null
+          phone_verified?: boolean
+          rating_avg?: number
+          rating_count?: number
           referral_code?: string | null
+          response_time_minutes?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -290,6 +323,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_hidden: boolean
           rating: number
           reviewee_user_id: string
           reviewer_user_id: string
@@ -299,6 +333,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_hidden?: boolean
           rating: number
           reviewee_user_id: string
           reviewer_user_id: string
@@ -308,6 +343,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_hidden?: boolean
           rating?: number
           reviewee_user_id?: string
           reviewer_user_id?: string
@@ -485,6 +521,39 @@ export type Database = {
         }
         Relationships: []
       }
+      verifications: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["verification_state"]
+          updated_at: string
+          user_id: string
+          verification_type: Database["public"]["Enums"]["verification_type"]
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["verification_state"]
+          updated_at?: string
+          user_id: string
+          verification_type: Database["public"]["Enums"]["verification_type"]
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["verification_state"]
+          updated_at?: string
+          user_id?: string
+          verification_type?: Database["public"]["Enums"]["verification_type"]
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -499,6 +568,11 @@ export type Database = {
       can_view_task: { Args: { check_task_id: string }; Returns: boolean }
       is_admin: { Args: { check_user_id: string }; Returns: boolean }
       is_tasker: { Args: { check_user_id: string }; Returns: boolean }
+      recalc_user_rating: { Args: { p_user_id: string }; Returns: undefined }
+      recalc_user_task_stats: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       tasker_can_instant_accept: {
         Args: { p_task_id: string; p_tasker_user_id: string }
         Returns: boolean
@@ -528,7 +602,9 @@ export type Database = {
         | "paid"
         | "cancelled"
         | "disputed"
+      verification_state: "pending" | "verified" | "rejected"
       verification_status: "none" | "pending" | "verified"
+      verification_type: "bankid" | "id" | "phone" | "email"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -681,7 +757,9 @@ export const Constants = {
         "cancelled",
         "disputed",
       ],
+      verification_state: ["pending", "verified", "rejected"],
       verification_status: ["none", "pending", "verified"],
+      verification_type: ["bankid", "id", "phone", "email"],
     },
   },
 } as const
