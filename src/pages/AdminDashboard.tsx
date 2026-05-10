@@ -313,6 +313,8 @@ const AdminDashboard = () => {
               </table>
             </div>
           </TabsContent>
+
+          <TabsContent value="tasks">
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-muted">
