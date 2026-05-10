@@ -170,6 +170,8 @@ const AdminDashboard = () => {
         <Tabs defaultValue="users" className="space-y-4">
           <TabsList>
             <TabsTrigger value="users">Användare</TabsTrigger>
+            <TabsTrigger value="verifications">Verifieringar</TabsTrigger>
+            <TabsTrigger value="reviews">Recensioner</TabsTrigger>
             <TabsTrigger value="tasks">Uppdrag</TabsTrigger>
             <TabsTrigger value="reports">Rapporter</TabsTrigger>
           </TabsList>
@@ -215,7 +217,102 @@ const AdminDashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="tasks">
+          <TabsContent value="verifications">
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="text-left p-3 font-medium">Användare</th>
+                    <th className="text-center p-3 font-medium">🟢 BankID</th>
+                    <th className="text-center p-3 font-medium">🪪 ID</th>
+                    <th className="text-center p-3 font-medium">📞 Telefon</th>
+                    <th className="text-center p-3 font-medium">✉️ E-post</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((u) => (
+                    <tr key={u.id} className="border-t border-border">
+                      <td className="p-3">
+                        <Link to={`/profile/${u.id}`} className="font-medium hover:underline">
+                          {u.name}
+                        </Link>
+                        <p className="text-xs text-muted-foreground">{u.email}</p>
+                      </td>
+                      {(["bankid_verified", "id_verified", "phone_verified", "email_verified"] as const).map(
+                        (f) => (
+                          <td key={f} className="p-3 text-center">
+                            <Button
+                              variant={u[f] ? "success" : "outline"}
+                              size="sm"
+                              onClick={() => toggleVerification(u.id, f, u[f])}
+                            >
+                              {u[f] ? "Verifierad" : "Markera"}
+                            </Button>
+                          </td>
+                        )
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="text-left p-3 font-medium">Betyg</th>
+                    <th className="text-left p-3 font-medium">Kommentar</th>
+                    <th className="text-left p-3 font-medium">Status</th>
+                    <th className="text-left p-3 font-medium">Datum</th>
+                    <th className="text-right p-3 font-medium">Åtgärd</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reviews.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                        Inga recensioner ännu
+                      </td>
+                    </tr>
+                  ) : (
+                    reviews.map((r) => (
+                      <tr key={r.id} className="border-t border-border">
+                        <td className="p-3">
+                          <span className="inline-flex items-center gap-1 font-medium">
+                            <Star size={14} className="text-warning fill-warning" />
+                            {r.rating}
+                          </span>
+                        </td>
+                        <td className="p-3 text-muted-foreground max-w-md">
+                          {r.text || <em>Ingen kommentar</em>}
+                        </td>
+                        <td className="p-3">
+                          <Badge variant={r.is_hidden ? "destructive" : "success"}>
+                            {r.is_hidden ? "Dold" : "Synlig"}
+                          </Badge>
+                        </td>
+                        <td className="p-3 text-muted-foreground">
+                          {new Date(r.created_at).toLocaleDateString("sv-SE")}
+                        </td>
+                        <td className="p-3 text-right">
+                          <Button
+                            variant={r.is_hidden ? "outline" : "destructive"}
+                            size="sm"
+                            onClick={() => toggleReviewHidden(r.id, r.is_hidden)}
+                          >
+                            {r.is_hidden ? "Visa" : "Dölj"}
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </TabsContent>
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-muted">
