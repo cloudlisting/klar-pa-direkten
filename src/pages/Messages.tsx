@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessageSquare, Send, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import TrustBadges from "@/components/TrustBadges";
+import { Link } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
 
 type ChatThread = Tables<"chat_threads"> & {
@@ -209,13 +211,24 @@ const Messages = () => {
                 >
                   <ArrowLeft size={18} />
                 </Button>
-                <div className="min-w-0">
-                  <p className="font-medium text-foreground truncate">
+                <div className="min-w-0 flex-1">
+                  <Link
+                    to={`/profile/${getOtherUserId(selectedThread)}`}
+                    className="font-medium text-foreground truncate hover:underline"
+                  >
                     {profiles[getOtherUserId(selectedThread)]?.name || "Användare"}
-                  </p>
+                  </Link>
                   <p className="text-xs text-muted-foreground truncate">
                     {(selectedThread as any).task?.title}
                   </p>
+                  {profiles[getOtherUserId(selectedThread)] && (
+                    <div className="mt-1.5">
+                      <TrustBadges
+                        data={profiles[getOtherUserId(selectedThread)]}
+                        size="sm"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-3">

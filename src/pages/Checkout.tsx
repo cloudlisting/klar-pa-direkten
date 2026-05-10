@@ -10,6 +10,7 @@ import { ArrowLeft, Shield, Lock, CheckCircle, AlertCircle, CreditCard } from "l
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { calculateFees, CUSTOMER_FEE_PERCENT, TASKER_FEE_PERCENT } from "@/lib/constants";
+import TrustBadges from "@/components/TrustBadges";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Task = Tables<"tasks">;
@@ -231,17 +232,21 @@ const Checkout = () => {
             </div>
 
             {/* Tasker info */}
-            <div className="flex items-center gap-3 mb-6 p-4 rounded-lg border border-border">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-lg">
+            <div className="flex items-start gap-3 mb-6 p-4 rounded-lg border border-border">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-lg shrink-0">
                 {taskerProfile?.name?.charAt(0) || "T"}
               </div>
-              <div className="flex-1">
-                <p className="font-semibold text-foreground">{taskerProfile?.name || "Tasker"}</p>
-                <p className="text-sm text-muted-foreground">
-                  Bud accepterat
-                </p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-semibold text-foreground">{taskerProfile?.name || "Tasker"}</p>
+                  <Badge variant="success">Vald tasker</Badge>
+                </div>
+                {taskerProfile && (
+                  <div className="mt-2">
+                    <TrustBadges data={taskerProfile} size="sm" />
+                  </div>
+                )}
               </div>
-              <Badge variant="success">Vald tasker</Badge>
             </div>
 
             <Separator className="my-6" />

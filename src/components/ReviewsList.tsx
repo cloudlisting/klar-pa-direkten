@@ -26,6 +26,7 @@ const ReviewsList = ({ userId, limit = 5 }: ReviewsListProps) => {
       .from("reviews")
       .select("*")
       .eq("reviewee_user_id", userId)
+      .eq("is_hidden", false)
       .order("created_at", { ascending: false })
       .limit(limit);
 

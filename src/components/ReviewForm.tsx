@@ -40,28 +40,6 @@ const ReviewForm = ({ task, revieweeId, revieweeName, onComplete }: ReviewFormPr
 
       if (error) throw error;
 
-      // Update tasker's average rating if reviewing a tasker
-      const { data: taskerProfile } = await supabase
-        .from("tasker_profiles")
-        .select("avg_rating, completed_tasks_count")
-        .eq("user_id", revieweeId)
-        .maybeSingle();
-
-      if (taskerProfile) {
-        const currentCount = taskerProfile.completed_tasks_count || 0;
-        const currentAvg = taskerProfile.avg_rating || 0;
-        const newCount = currentCount + 1;
-        const newAvg = ((currentAvg * currentCount) + rating) / newCount;
-
-        await supabase
-          .from("tasker_profiles")
-          .update({ 
-            avg_rating: Math.round(newAvg * 10) / 10,
-            completed_tasks_count: newCount 
-          })
-          .eq("user_id", revieweeId);
-      }
-
       toast.success("Tack för din recension!");
       onComplete();
     } catch (error: any) {

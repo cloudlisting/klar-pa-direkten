@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               .select("role")
               .eq("user_id", session.user.id);
             setIsAdmin(roles?.some((r) => r.role === "admin") ?? false);
-            
+
             // Check if user is tasker
             const { data: taskerProfile } = await supabase
               .from("tasker_profiles")
@@ -52,6 +52,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               .eq("user_id", session.user.id)
               .maybeSingle();
             setIsTasker(!!taskerProfile);
+
+            // Auto-mark email_verified if confirmed in auth
+            if (session.user.email_confirmed_at) {
+              await supabase
+                .from("profiles")
+                .update({ email_verified: true })
+                .eq("id", session.user.id)
+                .eq("email_verified", false);
+            }
           }, 0);
         } else {
           setIsAdmin(false);
