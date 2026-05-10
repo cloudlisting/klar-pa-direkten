@@ -242,11 +242,11 @@ const AdminDashboard = () => {
                         (f) => (
                           <td key={f} className="p-3 text-center">
                             <Button
-                              variant={u[f] ? "success" : "outline"}
+                              variant={u[f] ? "default" : "outline"}
                               size="sm"
                               onClick={() => toggleVerification(u.id, f, u[f])}
                             >
-                              {u[f] ? "Verifierad" : "Markera"}
+                              {u[f] ? "✓ Verifierad" : "Markera"}
                             </Button>
                           </td>
                         )
