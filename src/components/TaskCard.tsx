@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { MapPin, Clock, MessageSquare, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import TrustBadges, { TrustData } from "@/components/TrustBadges";
 
 interface TaskCardProps {
   task: {
@@ -17,6 +18,7 @@ interface TaskCardProps {
     postedBy: string;
     postedAt: string;
     offersCount: number;
+    posterTrust?: TrustData;
   };
 }
 
@@ -56,6 +58,12 @@ const TaskCard = ({ task }: TaskCardProps) => {
           <p className="text-xs text-muted-foreground">fast pris</p>
         </div>
       </div>
+
+      {task.posterTrust && (
+        <div className="mt-2 mb-3">
+          <TrustBadges data={task.posterTrust} size="sm" />
+        </div>
+      )}
 
       <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1 pt-3 border-t border-border">
         <span className="flex items-center gap-1">
