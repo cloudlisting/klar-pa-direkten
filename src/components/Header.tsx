@@ -4,6 +4,8 @@ import { Menu, X, User, LogOut, Settings, LayoutDashboard, Shield, MessageSquare
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { useT } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,11 +18,12 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user, isAdmin, signOut } = useAuth();
+  const t = useT();
 
   const navLinks = [
-    { to: "/browse", label: "Hitta uppdrag" },
-    { to: "/post-task", label: "Publicera uppdrag" },
-    { to: "/how-it-works", label: "Så fungerar det" },
+    { to: "/browse", label: t("nav.findTasks") },
+    { to: "/post-task", label: t("nav.postTask") },
+    { to: "/how-it-works", label: t("nav.howItWorks") },
   ];
 
   return (
@@ -51,31 +54,32 @@ const Header = () => {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
+          <LanguageSwitcher />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
                   <User size={16} />
-                  Konto
+                  {t("nav.account")}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard" className="flex items-center gap-2">
                     <LayoutDashboard size={14} />
-                    Dashboard
+                    {t("nav.dashboard")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/messages" className="flex items-center gap-2">
                     <MessageSquare size={14} />
-                    Meddelanden
+                    {t("nav.messages")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/settings" className="flex items-center gap-2">
                     <Settings size={14} />
-                    Inställningar
+                    {t("nav.settings")}
                   </Link>
                 </DropdownMenuItem>
                 {isAdmin && (
@@ -84,7 +88,7 @@ const Header = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/admin" className="flex items-center gap-2 text-destructive">
                         <Shield size={14} />
-                        Admin
+                        {t("nav.admin")}
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -92,29 +96,32 @@ const Header = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut} className="flex items-center gap-2">
                   <LogOut size={14} />
-                  Logga ut
+                  {t("nav.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/auth">Logga in</Link>
+                <Link to="/auth">{t("nav.login")}</Link>
               </Button>
               <Button variant="hero" size="sm" asChild>
-                <Link to="/auth">Kom igång</Link>
+                <Link to="/auth">{t("nav.getStarted")}</Link>
               </Button>
             </>
           )}
         </div>
 
         {/* Mobile toggle */}
-        <button
-          className="md:hidden rounded-lg p-2 text-muted-foreground hover:bg-secondary"
-          onClick={() => setMobileOpen(!mobileOpen)}
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageSwitcher />
+          <button
+            className="rounded-lg p-2 text-muted-foreground hover:bg-secondary"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -144,14 +151,14 @@ const Header = () => {
                     onClick={() => setMobileOpen(false)}
                     className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
                   >
-                    Dashboard
+                    {t("nav.dashboard")}
                   </Link>
                   <Link
                     to="/messages"
                     onClick={() => setMobileOpen(false)}
                     className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
                   >
-                    Meddelanden
+                    {t("nav.messages")}
                   </Link>
                   {isAdmin && (
                     <Link
@@ -159,7 +166,7 @@ const Header = () => {
                       onClick={() => setMobileOpen(false)}
                       className="rounded-lg px-4 py-3 text-sm font-medium text-destructive hover:bg-secondary"
                     >
-                      Admin
+                      {t("nav.admin")}
                     </Link>
                   )}
                   <div className="mt-2 border-t border-border pt-2">
@@ -171,17 +178,17 @@ const Header = () => {
                         setMobileOpen(false);
                       }}
                     >
-                      Logga ut
+                      {t("nav.logout")}
                     </Button>
                   </div>
                 </>
               ) : (
                 <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
                   <Button variant="ghost" className="justify-start" asChild>
-                    <Link to="/auth" onClick={() => setMobileOpen(false)}>Logga in</Link>
+                    <Link to="/auth" onClick={() => setMobileOpen(false)}>{t("nav.login")}</Link>
                   </Button>
                   <Button variant="hero" asChild>
-                    <Link to="/auth" onClick={() => setMobileOpen(false)}>Kom igång</Link>
+                    <Link to="/auth" onClick={() => setMobileOpen(false)}>{t("nav.getStarted")}</Link>
                   </Button>
                 </div>
               )}

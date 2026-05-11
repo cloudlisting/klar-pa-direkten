@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { useT } from "@/lib/i18n";
 
 const Footer = () => {
+  const t = useT();
   return (
     <footer className="border-t border-border bg-card">
       <div className="container py-12">
@@ -13,41 +15,41 @@ const Footer = () => {
               <span className="text-lg font-bold font-display text-foreground">Taskly</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Sveriges marknadsplats för vardagstjänster. Hitta hjälp eller hjälp andra.
+              {t("footer.tagline")}
             </p>
           </div>
 
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-foreground">För kunder</h4>
+            <h4 className="mb-3 text-sm font-semibold text-foreground">{t("footer.forCustomers")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/post-task" className="hover:text-foreground transition-colors">Publicera uppdrag</Link></li>
-              <li><Link to="/browse" className="hover:text-foreground transition-colors">Bläddra uppdrag</Link></li>
-              <li><Link to="/how-it-works" className="hover:text-foreground transition-colors">Så fungerar det</Link></li>
+              <li><Link to="/post-task" className="hover:text-foreground transition-colors">{t("nav.postTask")}</Link></li>
+              <li><Link to="/browse" className="hover:text-foreground transition-colors">{t("nav.findTasks")}</Link></li>
+              <li><Link to="/how-it-works" className="hover:text-foreground transition-colors">{t("nav.howItWorks")}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-foreground">För taskers</h4>
+            <h4 className="mb-3 text-sm font-semibold text-foreground">{t("footer.forTaskers")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/browse" className="hover:text-foreground transition-colors">Hitta uppdrag</Link></li>
-              <li><Link to="#" className="hover:text-foreground transition-colors">Bli tasker</Link></li>
-              <li><Link to="#" className="hover:text-foreground transition-colors">Hur du tjänar pengar</Link></li>
+              <li><Link to="/browse" className="hover:text-foreground transition-colors">{t("footer.findTasks")}</Link></li>
+              <li><Link to="/become-tasker" className="hover:text-foreground transition-colors">{t("footer.becomeTasker")}</Link></li>
+              <li><Link to="/how-it-works" className="hover:text-foreground transition-colors">{t("footer.earnMoney")}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-foreground">Företag</h4>
+            <h4 className="mb-3 text-sm font-semibold text-foreground">{t("footer.company")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="#" className="hover:text-foreground transition-colors">Om oss</Link></li>
-              <li><Link to="#" className="hover:text-foreground transition-colors">Villkor</Link></li>
-              <li><Link to="#" className="hover:text-foreground transition-colors">Integritetspolicy</Link></li>
-              <li><Link to="#" className="hover:text-foreground transition-colors">Kontakta oss</Link></li>
+              <li><Link to="/how-it-works" className="hover:text-foreground transition-colors">{t("footer.about")}</Link></li>
+              <li><Link to="#" className="hover:text-foreground transition-colors">{t("footer.terms")}</Link></li>
+              <li><Link to="#" className="hover:text-foreground transition-colors">{t("footer.privacy")}</Link></li>
+              <li><Link to="#" className="hover:text-foreground transition-colors">{t("footer.contact")}</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="mt-10 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-          © 2026 Taskly. Alla rättigheter förbehållna.
+          {t("footer.rights")}
         </div>
       </div>
     </footer>
