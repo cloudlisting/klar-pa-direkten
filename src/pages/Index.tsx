@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import CategoryGrid from "@/components/CategoryGrid";
 import LiveTaskFeed from "@/components/LiveTaskFeed";
+import HeroTaskFeed from "@/components/HeroTaskFeed";
+import ServiceMarquee from "@/components/ServiceMarquee";
 import { Link } from "react-router-dom";
 import { ArrowRight, Shield, Zap, Star, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
@@ -29,55 +31,80 @@ const Index = () => {
           <img src={heroImage} alt="" className="w-full h-full object-cover opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/95 to-primary/70" />
         </div>
-        <div className="container relative py-20 md:py-28">
-          <div className="max-w-2xl">
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-              <Badge variant="accent" className="mb-4 text-sm px-3 py-1">
-                {t("hero.badge")}
-              </Badge>
-            </motion.div>
-            <motion.h1
-              className="text-4xl font-bold text-primary-foreground md:text-5xl lg:text-6xl font-display leading-tight mb-5"
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={1}
-            >
-              {t("hero.title1")}{" "}
-              <span className="text-accent">{t("hero.title2")}</span>
-            </motion.h1>
-            <motion.p
-              className="text-lg text-primary-foreground/80 mb-8 max-w-lg"
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={2}
-            >
-              {t("hero.subtitle")}
-            </motion.p>
-            <motion.div
-              className="flex flex-wrap gap-3"
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={3}
-            >
-              <Button variant="accent" size="xl" asChild>
-                <Link to="/post-task">
-                  {t("hero.cta.post")}
-                  <ArrowRight size={18} />
-                </Link>
-              </Button>
-              <Button variant="hero-outline" size="xl" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" asChild>
-                <Link to="/browse">{t("hero.cta.browse")}</Link>
-              </Button>
-            </motion.div>
+        <div className="container relative py-16 md:py-20 lg:py-24">
+          {/* Two-column layout: text left, feed right */}
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+            {/* Left: Hero text */}
+            <div className="max-w-xl pt-4">
+              <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
+                <Badge variant="accent" className="mb-4 text-sm px-3 py-1">
+                  {t("hero.badge")}
+                </Badge>
+              </motion.div>
+              <motion.h1
+                className="text-4xl font-bold text-primary-foreground md:text-5xl lg:text-6xl font-display leading-tight mb-5"
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={1}
+              >
+                {t("hero.title1")}{" "}
+                <span className="text-accent">{t("hero.title2")}</span>
+              </motion.h1>
+              <motion.p
+                className="text-lg text-primary-foreground/80 mb-8 max-w-lg"
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={2}
+              >
+                {t("hero.subtitle")}
+              </motion.p>
+              <motion.div
+                className="flex flex-wrap gap-3"
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={3}
+              >
+                <Button variant="accent" size="xl" asChild>
+                  <Link to="/post-task">
+                    {t("hero.cta.post")}
+                    <ArrowRight size={18} />
+                  </Link>
+                </Button>
+                <Button
+                  variant="hero-outline"
+                  size="xl"
+                  className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                  asChild
+                >
+                  <Link to="/browse">{t("hero.cta.browse")}</Link>
+                </Button>
+              </motion.div>
+            </div>
+
+            {/* Right: Vertical live feed (desktop only) */}
+            <div className="hidden lg:block">
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+              >
+                <HeroTaskFeed />
+              </motion.div>
+            </div>
           </div>
+
+          {/* Bottom: Horizontal service marquee */}
+          <ServiceMarquee />
         </div>
       </section>
 
-      {/* Live local task feed */}
-      <LiveTaskFeed />
+      {/* Mobile: standalone live feed */}
+      <div className="lg:hidden">
+        <LiveTaskFeed />
+      </div>
 
       {/* How it works */}
       <section className="py-16 md:py-20 bg-secondary/30">
