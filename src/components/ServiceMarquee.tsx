@@ -1,3 +1,4 @@
+import type { LucideProps } from "lucide-react";
 import {
   PackageOpen,
   Sparkles,
@@ -10,13 +11,14 @@ import {
   Monitor,
   CircleHelp,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface ServiceItem {
   titleSv: string;
   titleEn: string;
   descSv: string;
   descEn: string;
-  icon: React.ComponentType<{ className?: string; size?: number }>;
+  icon: React.ComponentType<LucideProps>;
   gradient: string;
 }
 
@@ -102,8 +104,6 @@ const SERVICES: ServiceItem[] = [
     gradient: "from-cyan-600 to-sky-400",
   },
 ];
-
-import { useI18n } from "@/lib/i18n";
 
 const ServiceCard = ({ service }: { service: ServiceItem }) => {
   const { lang } = useI18n();
