@@ -91,19 +91,19 @@ const TaskDetail = () => {
     if (!task) return;
     // Fetch customer profile (for tasker to review)
     const { data: custProfile } = await supabase
-      .from("profiles")
+      .from("public_profiles" as any)
       .select("*")
       .eq("id", task.customer_user_id)
-      .maybeSingle();
+      .maybeSingle() as any;
     if (custProfile) setCustomerProfile(custProfile);
 
     // Fetch assigned tasker profile (for customer to review)
     if (task.assigned_tasker_id) {
       const { data: taskerProf } = await supabase
-        .from("profiles")
+        .from("public_profiles" as any)
         .select("*")
         .eq("id", task.assigned_tasker_id)
-        .maybeSingle();
+        .maybeSingle() as any;
       if (taskerProf) setTaskerUserProfile(taskerProf);
     }
   };
@@ -136,10 +136,10 @@ const TaskDetail = () => {
 
     // Always fetch customer profile for trust display
     const { data: custProfile } = await supabase
-      .from("profiles")
+      .from("public_profiles" as any)
       .select("*")
       .eq("id", taskData.customer_user_id)
-      .maybeSingle();
+      .maybeSingle() as any;
     if (custProfile) setCustomerProfile(custProfile);
 
     // Fetch offers if logged in
@@ -154,7 +154,7 @@ const TaskDetail = () => {
         const taskerIds = offersData.map((o) => o.tasker_user_id);
         const [taskerProfiles, profiles] = await Promise.all([
           supabase.from("tasker_profiles").select("*").in("user_id", taskerIds),
-          supabase.from("profiles").select("*").in("id", taskerIds),
+          supabase.from("public_profiles" as any).select("*").in("id", taskerIds) as any,
         ]);
 
         const enrichedOffers = offersData.map((offer) => ({

@@ -34,9 +34,9 @@ const ReviewsList = ({ userId, limit = 5 }: ReviewsListProps) => {
       // Fetch reviewer profiles
       const reviewerIds = data.map((r) => r.reviewer_user_id);
       const { data: profiles } = await supabase
-        .from("profiles")
+        .from("public_profiles" as any)
         .select("*")
-        .in("id", reviewerIds);
+        .in("id", reviewerIds) as any;
 
       const enriched = data.map((review) => ({
         ...review,
