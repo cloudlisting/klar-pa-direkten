@@ -556,7 +556,60 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bankid_verified: boolean | null
+          bio: string | null
+          cancelled_tasks: number | null
+          completed_tasks: number | null
+          completion_rate: number | null
+          created_at: string | null
+          email_verified: boolean | null
+          id: string | null
+          id_verified: boolean | null
+          name: string | null
+          phone_verified: boolean | null
+          rating_avg: number | null
+          rating_count: number | null
+          response_time_minutes: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bankid_verified?: boolean | null
+          bio?: string | null
+          cancelled_tasks?: number | null
+          completed_tasks?: number | null
+          completion_rate?: number | null
+          created_at?: string | null
+          email_verified?: boolean | null
+          id?: string | null
+          id_verified?: boolean | null
+          name?: string | null
+          phone_verified?: boolean | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          response_time_minutes?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bankid_verified?: boolean | null
+          bio?: string | null
+          cancelled_tasks?: number | null
+          completed_tasks?: number | null
+          completion_rate?: number | null
+          created_at?: string | null
+          email_verified?: boolean | null
+          id?: string | null
+          id_verified?: boolean | null
+          name?: string | null
+          phone_verified?: boolean | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          response_time_minutes?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_access_offer: { Args: { check_offer_id: string }; Returns: boolean }
