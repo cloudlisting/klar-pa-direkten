@@ -80,10 +80,10 @@ const Checkout = () => {
 
       // Fetch tasker profile
       const { data: profileData } = await supabase
-        .from("profiles")
+        .from("public_profiles" as any)
         .select("*")
         .eq("id", offerData.tasker_user_id)
-        .single();
+        .single() as any;
 
       if (profileData) {
         setTaskerProfile(profileData);

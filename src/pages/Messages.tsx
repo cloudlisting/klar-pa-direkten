@@ -98,9 +98,9 @@ const Messages = () => {
       });
 
       const { data: profilesData } = await supabase
-        .from("profiles")
+        .from("public_profiles" as any)
         .select("*")
-        .in("id", Array.from(userIds));
+        .in("id", Array.from(userIds)) as any;
 
       if (profilesData) {
         const profileMap: Record<string, Tables<"profiles">> = {};

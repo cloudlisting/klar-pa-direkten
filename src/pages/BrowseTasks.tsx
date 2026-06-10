@@ -39,7 +39,7 @@ const BrowseTasks = () => {
       const customerIds = Array.from(new Set(data.map((t) => t.customer_user_id)));
       const [{ data: offerCounts }, { data: posters }] = await Promise.all([
         supabase.from("offers").select("task_id").in("task_id", taskIds),
-        supabase.from("profiles").select("*").in("id", customerIds),
+        supabase.from("public_profiles" as any).select("*").in("id", customerIds) as any,
       ]);
 
       const countsMap: Record<string, number> = {};

@@ -23,7 +23,7 @@ const PublicProfile = () => {
     if (!userId) return;
     (async () => {
       const [{ data: p }, { data: tp }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+        supabase.from("public_profiles" as any).select("*").eq("id", userId).maybeSingle() as any,
         supabase.from("tasker_profiles").select("*").eq("user_id", userId).maybeSingle(),
       ]);
       setProfile(p);
