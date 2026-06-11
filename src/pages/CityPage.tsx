@@ -83,7 +83,7 @@ const CityPage = () => {
   return (
     <Layout>
       {/* SEO meta tags */}
-      <title>{`Uppdrag i ${cityName} | Hitta hjälp lokalt | Taskly`}</title>
+      <title>{`Uppdrag i ${cityName} | Hitta hjälp lokalt | Moas`}</title>
       <meta name="description" content={`Hitta lokala taskers i ${cityName}. Städning, flytt, hantverkare och mer. Jämför priser och boka enkelt online.`} />
 
       <div className="bg-secondary/50 border-b border-border">

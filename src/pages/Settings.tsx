@@ -136,7 +136,7 @@ const Settings = () => {
           <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 mt-6">
             <h2 className="font-semibold text-destructive mb-2">Logga ut</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Du kommer att behöva logga in igen för att använda Taskly.
+              Du kommer att behöva logga in igen för att använda Moas.
             </p>
             <Button variant="destructive" onClick={signOut}>
               Logga ut
