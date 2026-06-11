@@ -64,7 +64,7 @@ const sv: Dict = {
   "footer.terms": "Villkor",
   "footer.privacy": "Integritetspolicy",
   "footer.contact": "Kontakta oss",
-  "footer.rights": "© 2026 Taskly. Alla rättigheter förbehållna.",
+  "footer.rights": "© 2026 Moas. Alla rättigheter förbehållna.",
   // Common
   "common.loading": "Laddar...",
   "common.open": "Öppen",
