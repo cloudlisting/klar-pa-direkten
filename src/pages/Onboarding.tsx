@@ -17,30 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Briefcase, ShoppingBag, Building2, MapPin, Phone } from "lucide-react";
-
-const SWEDISH_CITIES = [
-  "Stockholm",
-  "Göteborg",
-  "Malmö",
-  "Uppsala",
-  "Västerås",
-  "Örebro",
-  "Linköping",
-  "Helsingborg",
-  "Jönköping",
-  "Norrköping",
-  "Lund",
-  "Umeå",
-  "Gävle",
-  "Borås",
-  "Sundsvall",
-];
+import { MapPin, Phone, User } from "lucide-react";
+import { SWEDISH_CITIES } from "@/lib/constants";
 
 const schema = z.object({
-  role: z.enum(["bestallare", "tasker", "foretag"], {
-    errorMap: () => ({ message: "Välj en roll" }),
-  }),
+  first_name: z.string().trim().min(1, { message: "Ange ditt förnamn" }).max(60),
+  last_name: z.string().trim().min(1, { message: "Ange ditt efternamn" }).max(60),
   city: z.string().trim().min(2, { message: "Välj din stad" }).max(80),
   phone: z
     .string()
@@ -51,31 +33,11 @@ const schema = z.object({
   terms: z.literal(true, { errorMap: () => ({ message: "Du måste godkänna villkoren" }) }),
 });
 
-const ROLE_OPTIONS = [
-  {
-    value: "bestallare" as const,
-    title: "Beställare",
-    desc: "Jag vill lägga upp uppdrag",
-    icon: ShoppingBag,
-  },
-  {
-    value: "tasker" as const,
-    title: "Runner / Tasker",
-    desc: "Jag vill utföra uppdrag",
-    icon: Briefcase,
-  },
-  {
-    value: "foretag" as const,
-    title: "Företag",
-    desc: "Vi erbjuder tjänster",
-    icon: Building2,
-  },
-];
-
 const Onboarding = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, refreshProfile } = useAuth();
-  const [role, setRole] = useState<"bestallare" | "tasker" | "foretag" | "">("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
   const [terms, setTerms] = useState(false);
@@ -85,6 +47,33 @@ const Onboarding = () => {
     if (!authLoading && !user) navigate("/auth", { replace: true });
   }, [authLoading, user, navigate]);
 
+  // Prefill from Google metadata + existing profile
+  useEffect(() => {
+    if (!user) return;
+    const meta = (user.user_metadata || {}) as Record<string, string>;
+    const given = meta.given_name || "";
+    const family = meta.family_name || "";
+    const fallbackFull = (meta.name || meta.full_name || "").trim();
+    let g = given, f = family;
+    if (!g && !f && fallbackFull) {
+      const parts = fallbackFull.split(/\s+/);
+      g = parts[0] || "";
+      f = parts.slice(1).join(" ") || "";
+    }
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, phone, city" as any)
+        .eq("id", user.id)
+        .maybeSingle();
+      const p = (data as any) || {};
+      setFirstName(p.first_name || g);
+      setLastName(p.last_name || f);
+      setPhone(p.phone || "");
+      setCity(p.city || "");
+    })();
+  }, [user]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -92,7 +81,13 @@ const Onboarding = () => {
       navigate("/auth", { replace: true });
       return;
     }
-    const parsed = schema.safeParse({ role, city, phone, terms });
+    const parsed = schema.safeParse({
+      first_name: firstName,
+      last_name: lastName,
+      city,
+      phone,
+      terms,
+    });
     if (!parsed.success) {
       const msg = parsed.error.issues[0]?.message || "Fyll i alla obligatoriska fält";
       console.warn("[Onboarding] validation failed:", parsed.error.issues);
@@ -101,10 +96,13 @@ const Onboarding = () => {
     }
     setSubmitting(true);
     try {
+      const fullName = `${parsed.data.first_name} ${parsed.data.last_name}`.trim();
       const { data, error } = await supabase
         .from("profiles")
         .update({
-          role: parsed.data.role,
+          first_name: parsed.data.first_name,
+          last_name: parsed.data.last_name,
+          name: fullName,
           city: parsed.data.city,
           phone: parsed.data.phone,
           google_connected: true,
@@ -145,39 +143,67 @@ const Onboarding = () => {
               Välkommen till Moas
             </h1>
             <p className="text-muted-foreground">
-              Berätta lite om dig själv så hittar vi rätt uppdrag åt dig.
+              Berätta lite om dig själv så kan du både lägga upp uppdrag och utföra dem.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="first_name">Förnamn</Label>
+                <div className="relative mt-1.5">
+                  <User
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    size={16}
+                  />
+                  <Input
+                    id="first_name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Anna"
+                    className="pl-10"
+                    maxLength={60}
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="last_name">Efternamn</Label>
+                <div className="relative mt-1.5">
+                  <User
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    size={16}
+                  />
+                  <Input
+                    id="last_name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Andersson"
+                    className="pl-10"
+                    maxLength={60}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
             <div>
-              <Label className="mb-3 block text-sm font-medium">Jag är...</Label>
-              <div className="grid gap-3 sm:grid-cols-3">
-                {ROLE_OPTIONS.map((opt) => {
-                  const Icon = opt.icon;
-                  const active = role === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setRole(opt.value)}
-                      className={`rounded-xl border-2 p-4 text-left transition-all ${
-                        active
-                          ? "border-primary bg-primary/5 shadow-sm"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <Icon
-                        size={22}
-                        className={active ? "text-primary" : "text-muted-foreground"}
-                      />
-                      <div className="mt-2 text-sm font-semibold text-foreground">
-                        {opt.title}
-                      </div>
-                      <div className="text-xs text-muted-foreground">{opt.desc}</div>
-                    </button>
-                  );
-                })}
+              <Label htmlFor="phone">Telefonnummer</Label>
+              <div className="relative mt-1.5">
+                <Phone
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  size={16}
+                />
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+46 70 123 45 67"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="pl-10"
+                  maxLength={20}
+                  required
+                />
               </div>
             </div>
 
@@ -203,24 +229,10 @@ const Onboarding = () => {
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="phone">Telefonnummer</Label>
-              <div className="relative mt-1.5">
-                <Phone
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  size={16}
-                />
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+46 70 123 45 67"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="pl-10"
-                  maxLength={20}
-                  required
-                />
-              </div>
+            <div className="rounded-lg border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+              Du kan både <span className="font-medium text-foreground">lägga upp uppdrag</span> och{" "}
+              <span className="font-medium text-foreground">utföra uppdrag</span> — du behöver inte
+              välja nu. BankID-verifiering krävs senare för att utföra uppdrag åt andra.
             </div>
 
             <div className="flex items-start gap-3 rounded-lg border border-border bg-secondary/30 p-4">
@@ -242,12 +254,6 @@ const Onboarding = () => {
                 .
               </Label>
             </div>
-
-            {(!role || !city || !phone || !terms) && (
-              <p className="text-xs text-muted-foreground">
-                Välj roll, stad, telefonnummer och godkänn villkoren för att fortsätta.
-              </p>
-            )}
 
             <Button
               type="submit"
