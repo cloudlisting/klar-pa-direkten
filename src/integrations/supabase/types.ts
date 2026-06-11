@@ -619,6 +619,7 @@ export type Database = {
       }
       can_access_thread: { Args: { check_thread_id: string }; Returns: boolean }
       can_view_task: { Args: { check_task_id: string }; Returns: boolean }
+      get_task_address: { Args: { p_task_id: string }; Returns: string }
       is_admin: { Args: { check_user_id: string }; Returns: boolean }
       is_tasker: { Args: { check_user_id: string }; Returns: boolean }
       recalc_user_rating: { Args: { p_user_id: string }; Returns: undefined }
