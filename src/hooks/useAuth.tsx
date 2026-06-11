@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -8,8 +8,11 @@ interface AuthContextType {
   loading: boolean;
   isAdmin: boolean;
   isTasker: boolean;
+  needsOnboarding: boolean;
+  profileLoaded: boolean;
   signOut: () => Promise<void>;
   refreshTaskerStatus: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,16 +31,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTasker, setIsTasker] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+
+  const loadProfileFlags = useCallback(async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("onboarding_completed" as any)
+      .eq("id", userId)
+      .maybeSingle();
+    const completed = (data as any)?.onboarding_completed === true;
+    setNeedsOnboarding(!completed);
+    setProfileLoaded(true);
+  }, []);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
-          // Check if user is admin
           setTimeout(async () => {
             const { data: roles } = await supabase
               .from("user_roles")
@@ -45,7 +59,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               .eq("user_id", session.user.id);
             setIsAdmin(roles?.some((r) => r.role === "admin") ?? false);
 
-            // Check if user is tasker
             const { data: taskerProfile } = await supabase
               .from("tasker_profiles")
               .select("id")
@@ -53,7 +66,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               .maybeSingle();
             setIsTasker(!!taskerProfile);
 
-            // Auto-mark email_verified if confirmed in auth
             if (session.user.email_confirmed_at) {
               await supabase
                 .from("profiles")
@@ -61,25 +73,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 .eq("id", session.user.id)
                 .eq("email_verified", false);
             }
+
+            // Mark google_connected if signed in with Google
+            const hasGoogle = session.user.app_metadata?.providers?.includes?.("google")
+              || session.user.app_metadata?.provider === "google";
+            if (hasGoogle) {
+              await supabase
+                .from("profiles")
+                .update({ google_connected: true } as any)
+                .eq("id", session.user.id);
+            }
+
+            await loadProfileFlags(session.user.id);
           }, 0);
         } else {
           setIsAdmin(false);
           setIsTasker(false);
+          setNeedsOnboarding(false);
+          setProfileLoaded(false);
         }
-        
+
         setLoading(false);
       }
     );
 
-    // THEN get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        loadProfileFlags(session.user.id);
+      }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [loadProfileFlags]);
 
   const refreshTaskerStatus = async () => {
     if (!user) return;
@@ -91,16 +119,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsTasker(!!taskerProfile);
   };
 
+  const refreshProfile = async () => {
+    if (!user) return;
+    await loadProfileFlags(user.id);
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setIsAdmin(false);
     setIsTasker(false);
+    setNeedsOnboarding(false);
+    setProfileLoaded(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAdmin, isTasker, signOut, refreshTaskerStatus }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        loading,
+        isAdmin,
+        isTasker,
+        needsOnboarding,
+        profileLoaded,
+        signOut,
+        refreshTaskerStatus,
+        refreshProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

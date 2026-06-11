@@ -2,11 +2,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { I18nProvider } from "@/lib/i18n";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import TaskerDashboard from "./pages/TaskerDashboard";
 import BecomeTasker from "./pages/BecomeTasker";
@@ -26,6 +28,24 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Routes that should NOT trigger an onboarding redirect
+const ONBOARDING_EXEMPT = new Set<string>(["/onboarding", "/auth"]);
+
+const OnboardingGate = () => {
+  const { user, needsOnboarding, profileLoaded, loading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loading || !user || !profileLoaded) return;
+    if (needsOnboarding && !ONBOARDING_EXEMPT.has(location.pathname)) {
+      navigate("/onboarding", { replace: true });
+    }
+  }, [loading, user, profileLoaded, needsOnboarding, location.pathname, navigate]);
+
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <I18nProvider>
@@ -34,9 +54,11 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <OnboardingGate />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/tasker-dashboard" element={<TaskerDashboard />} />
             <Route path="/become-tasker" element={<BecomeTasker />} />
