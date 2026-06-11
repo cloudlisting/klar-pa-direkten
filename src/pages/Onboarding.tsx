@@ -241,12 +241,18 @@ const Onboarding = () => {
               </Label>
             </div>
 
+            {(!role || !city || !phone || !terms) && (
+              <p className="text-xs text-muted-foreground">
+                Välj roll, stad, telefonnummer och godkänn villkoren för att fortsätta.
+              </p>
+            )}
+
             <Button
               type="submit"
               variant="hero"
               size="lg"
               className="w-full"
-              disabled={submitting || !role || !city || !phone || !terms}
+              disabled={submitting}
             >
               {submitting ? "Sparar..." : "Slutför och fortsätt"}
             </Button>
