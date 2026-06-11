@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { CATEGORIES, SWEDISH_CITIES } from "@/lib/constants";
 import { Search, SlidersHorizontal, MapPin, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -14,12 +15,19 @@ type Profile = Tables<"profiles">;
 type TaskWithOffers = Task & { offers_count: number; poster?: Profile };
 
 const BrowseTasks = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialCategory = searchParams.get("category") || "all";
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [selectedCity, setSelectedCity] = useState<string>("all");
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(initialCategory !== "all");
   const [tasks, setTasks] = useState<TaskWithOffers[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const c = searchParams.get("category") || "all";
+    setSelectedCategory(c);
+  }, [searchParams]);
 
   useEffect(() => {
     fetchTasks();
@@ -73,6 +81,9 @@ const BrowseTasks = () => {
     setSearch("");
     setSelectedCategory("all");
     setSelectedCity("all");
+    const next = new URLSearchParams(searchParams);
+    next.delete("category");
+    setSearchParams(next, { replace: true });
   };
 
   const hasActiveFilters = search || selectedCategory !== "all" || selectedCity !== "all";
@@ -115,7 +126,7 @@ const BrowseTasks = () => {
             <div className="mt-4 flex flex-wrap gap-3 items-end">
               <div className="w-48">
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Kategori</label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <Select value={selectedCategory} onValueChange={(v) => { setSelectedCategory(v); const next = new URLSearchParams(searchParams); if (v === "all") next.delete("category"); else next.set("category", v); setSearchParams(next, { replace: true }); }}>
                   <SelectTrigger>
                     <SelectValue placeholder="Alla kategorier" />
                   </SelectTrigger>

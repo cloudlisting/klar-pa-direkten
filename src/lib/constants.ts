@@ -4,14 +4,16 @@ export const TASKER_FEE_PERCENT = 0.10; // 10% tasker commission
 
 // Categories (no mock tasks - using Supabase)
 export const CATEGORIES = [
-  { id: "cleaning", name: "Städning", icon: "🧹" },
-  { id: "moving", name: "Flytt & transport", icon: "📦" },
-  { id: "handyman", name: "Hantverkare", icon: "🔧" },
-  { id: "gardening", name: "Trädgård", icon: "🌿" },
-  { id: "assembly", name: "Montering", icon: "🪛" },
-  { id: "delivery", name: "Leverans", icon: "🚚" },
-  { id: "painting", name: "Målning", icon: "🎨" },
-  { id: "other", name: "Övrigt", icon: "✨" },
+  { id: "waste", name: "Avfall & återvinning", icon: "🗑️", desc: "Sopor, återvinning, hämtning av skräp, grovsopor" },
+  { id: "errands", name: "Inköp & ärenden", icon: "🛍️", desc: "Handla mat, uträtta ärenden, paketreturer & paketinlämning" },
+  { id: "moving", name: "Flytt & transport", icon: "📦", desc: "Flytthjälp, bärhjälp, transport, hämtning, hemleverans" },
+  { id: "assembly", name: "Möbelmontering", icon: "🪛", desc: "Montera möbler, IKEA-montering" },
+  { id: "handyman", name: "Småfix i hemmet", icon: "🔧", desc: "Fixa lampor, småel, sätta upp tavlor/hyllor/gardiner, mindre reparationer, handyman" },
+  { id: "cleaning", name: "Städning", icon: "🧹", desc: "Hemstädning, flyttstädning, fönsterputs" },
+  { id: "gardening", name: "Trädgård & utemiljö", icon: "🌿", desc: "Gräsklippning, ogräs, snöskottning" },
+  { id: "tech", name: "IT- & teknikhjälp", icon: "💻", desc: "Installera teknik, hjälp med dator/telefon" },
+  { id: "pets", name: "Djur", icon: "🐶", desc: "Hundpromenad, djurpassning" },
+  { id: "other", name: "Övrigt", icon: "✨", desc: "Annat" },
 ] as const;
 
 // Swedish cities for MVP
