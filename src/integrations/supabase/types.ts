@@ -196,10 +196,12 @@ export type Database = {
           created_at: string
           email: string
           email_verified: boolean
+          first_name: string | null
           google_connected: boolean
           id: string
           id_verified: boolean
           is_deactivated: boolean
+          last_name: string | null
           name: string
           onboarding_completed: boolean
           phone: string | null
@@ -222,10 +224,12 @@ export type Database = {
           created_at?: string
           email: string
           email_verified?: boolean
+          first_name?: string | null
           google_connected?: boolean
           id: string
           id_verified?: boolean
           is_deactivated?: boolean
+          last_name?: string | null
           name: string
           onboarding_completed?: boolean
           phone?: string | null
@@ -248,10 +252,12 @@ export type Database = {
           created_at?: string
           email?: string
           email_verified?: boolean
+          first_name?: string | null
           google_connected?: boolean
           id?: string
           id_verified?: boolean
           is_deactivated?: boolean
+          last_name?: string | null
           name?: string
           onboarding_completed?: boolean
           phone?: string | null
