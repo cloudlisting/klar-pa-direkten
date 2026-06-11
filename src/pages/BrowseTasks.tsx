@@ -81,6 +81,9 @@ const BrowseTasks = () => {
     setSearch("");
     setSelectedCategory("all");
     setSelectedCity("all");
+    const next = new URLSearchParams(searchParams);
+    next.delete("category");
+    setSearchParams(next, { replace: true });
   };
 
   const hasActiveFilters = search || selectedCategory !== "all" || selectedCity !== "all";
