@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { CATEGORIES, SWEDISH_CITIES } from "@/lib/constants";
 import { Search, SlidersHorizontal, MapPin, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
