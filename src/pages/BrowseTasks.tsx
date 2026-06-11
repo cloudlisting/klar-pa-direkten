@@ -15,12 +15,19 @@ type Profile = Tables<"profiles">;
 type TaskWithOffers = Task & { offers_count: number; poster?: Profile };
 
 const BrowseTasks = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialCategory = searchParams.get("category") || "all";
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [selectedCity, setSelectedCity] = useState<string>("all");
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(initialCategory !== "all");
   const [tasks, setTasks] = useState<TaskWithOffers[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const c = searchParams.get("category") || "all";
+    setSelectedCategory(c);
+  }, [searchParams]);
 
   useEffect(() => {
     fetchTasks();
