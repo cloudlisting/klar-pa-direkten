@@ -578,6 +578,7 @@ export type Database = {
           completion_rate: number | null
           created_at: string | null
           email_verified: boolean | null
+          google_connected: boolean | null
           id: string | null
           id_verified: boolean | null
           name: string | null
@@ -595,6 +596,7 @@ export type Database = {
           completion_rate?: number | null
           created_at?: string | null
           email_verified?: boolean | null
+          google_connected?: boolean | null
           id?: string | null
           id_verified?: boolean | null
           name?: string | null
@@ -612,6 +614,7 @@ export type Database = {
           completion_rate?: number | null
           created_at?: string | null
           email_verified?: boolean | null
+          google_connected?: boolean | null
           id?: string | null
           id_verified?: boolean | null
           name?: string | null

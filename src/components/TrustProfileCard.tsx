@@ -16,8 +16,7 @@ const TrustProfileCard = ({ userId, name, avatarUrl, trust, subtitle, compact }:
   const verifiedCount =
     Number(!!trust.bankid_verified) +
     Number(!!trust.id_verified) +
-    Number(!!trust.phone_verified) +
-    Number(!!trust.email_verified);
+    Number(!!trust.phone_verified);
 
   return (
     <div className="flex items-start gap-3">
