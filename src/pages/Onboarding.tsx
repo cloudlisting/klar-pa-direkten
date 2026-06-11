@@ -38,12 +38,14 @@ const SWEDISH_CITIES = [
 ];
 
 const schema = z.object({
-  role: z.enum(["bestallare", "tasker", "foretag"]),
-  city: z.string().trim().min(2).max(80),
+  role: z.enum(["bestallare", "tasker", "foretag"], {
+    errorMap: () => ({ message: "Välj en roll" }),
+  }),
+  city: z.string().trim().min(2, { message: "Välj din stad" }).max(80),
   phone: z
     .string()
     .trim()
-    .min(6, { message: "För kort" })
+    .min(6, { message: "Ange ett telefonnummer" })
     .max(20)
     .regex(/^[+0-9\s-]+$/, { message: "Ogiltigt telefonnummer" }),
   terms: z.literal(true, { errorMap: () => ({ message: "Du måste godkänna villkoren" }) }),
