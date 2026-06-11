@@ -127,7 +127,7 @@ const en: Dict = {
   "footer.terms": "Terms",
   "footer.privacy": "Privacy policy",
   "footer.contact": "Contact us",
-  "footer.rights": "© 2026 Taskly. All rights reserved.",
+  "footer.rights": "© 2026 Moas. All rights reserved.",
   "common.loading": "Loading...",
   "common.open": "Open",
   "common.instant": "Instant",
