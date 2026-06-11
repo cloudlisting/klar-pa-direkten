@@ -85,15 +85,21 @@ const Onboarding = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      toast.error("Du måste vara inloggad");
+      navigate("/auth", { replace: true });
+      return;
+    }
     const parsed = schema.safeParse({ role, city, phone, terms });
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message || "Fyll i alla fält");
+      const msg = parsed.error.issues[0]?.message || "Fyll i alla obligatoriska fält";
+      console.warn("[Onboarding] validation failed:", parsed.error.issues);
+      toast.error(msg);
       return;
     }
     setSubmitting(true);
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .update({
           role: parsed.data.role,
@@ -102,13 +108,23 @@ const Onboarding = () => {
           google_connected: true,
           onboarding_completed: true,
         } as any)
-        .eq("id", user.id);
-      if (error) throw error;
+        .eq("id", user.id)
+        .select("id, onboarding_completed")
+        .maybeSingle();
+      if (error) {
+        console.error("[Onboarding] update failed:", error);
+        throw error;
+      }
+      if (!data) {
+        console.error("[Onboarding] update returned no row (RLS or missing profile)");
+        throw new Error("Kunde inte uppdatera profilen. Försök logga in igen.");
+      }
       await refreshProfile();
       toast.success("Välkommen till Moas!");
       navigate("/dashboard", { replace: true });
     } catch (err: any) {
-      toast.error(err.message || "Kunde inte spara profilen");
+      console.error("[Onboarding] submit error:", err);
+      toast.error(err?.message || "Kunde inte spara profilen");
     } finally {
       setSubmitting(false);
     }
