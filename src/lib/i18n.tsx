@@ -18,10 +18,10 @@ const sv: Dict = {
   "nav.admin": "Admin",
   "nav.logout": "Logga ut",
   // Hero
-  "hero.badge": "🇸🇪 Sveriges marknadsplats för tjänster",
-  "hero.title1": "Få saker gjorda.",
-  "hero.title2": "Snabbt & enkelt.",
-  "hero.subtitle": "Hitta pålitliga taskers i ditt område eller tjäna pengar genom att hjälpa andra med vardagliga uppdrag.",
+  "hero.badge": "🇸🇪 Sveriges trygga marknadsplats för uppdrag",
+  "hero.title1": "Få saker gjorda",
+  "hero.title2": "nära dig",
+  "hero.subtitle": "Moas är en svensk marknadsplats där du kan lägga upp uppdrag och få hjälp av verifierade personer och företag i ditt område.",
   "hero.cta.post": "Publicera ett uppdrag",
   "hero.cta.browse": "Bläddra uppdrag",
   // Live feed
