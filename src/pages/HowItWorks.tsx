@@ -44,7 +44,7 @@ const customerSteps: Step[] = [
   {
     icon: <Wallet className="text-accent" size={26} />,
     title: "Sätt din budget",
-    desc: "Ange ett fast pris i SEK för uppdraget. Du bestämmer själv vad du är villig att betala – Taskly hjälper dig med rekommendationer baserat på liknande uppdrag.",
+    desc: "Ange ett fast pris i SEK för uppdraget. Du bestämmer själv vad du är villig att betala – Moas hjälper dig med rekommendationer baserat på liknande uppdrag.",
   },
   {
     icon: <Users className="text-accent" size={26} />,
@@ -59,7 +59,7 @@ const customerSteps: Step[] = [
   {
     icon: <Lock className="text-accent" size={26} />,
     title: "Betala tryggt",
-    desc: "Taskly är byggt för säker betalning via plattformen. Pengarna hålls säkert och släpps till taskern först när uppdraget är slutfört och du är nöjd.",
+    desc: "Moas är byggt för säker betalning via plattformen. Pengarna hålls säkert och släpps till taskern först när uppdraget är slutfört och du är nöjd.",
   },
   {
     icon: <ThumbsUp className="text-accent" size={26} />,
@@ -120,14 +120,14 @@ const trustItems: TrustItem[] = [
 ];
 
 const faqs = [
-  { q: "Vad är Taskly?", a: "Taskly är Sveriges marknadsplats för vardagsuppdrag. Du kan publicera uppdrag som städning, flytt, montering, trädgård, hantverk och mycket mer – och få hjälp av lokala taskers." },
+  { q: "Vad är Moas?", a: "Moas är Sveriges marknadsplats för vardagsuppdrag. Du kan publicera uppdrag som städning, flytt, montering, trädgård, hantverk och mycket mer – och få hjälp av lokala taskers." },
   { q: "Är det gratis att publicera uppdrag?", a: "Ja, det är helt gratis att publicera ett uppdrag. En liten serviceavgift tillkommer endast när uppdraget är tilldelat och betalt." },
   { q: "Hur väljer jag rätt tasker?", a: "Jämför profiler, betyg, omdömen och verifieringar. Du kan också chatta med taskern innan du accepterar ett bud för att ställa frågor." },
-  { q: "Hur fungerar betalning?", a: "Taskly är byggt för säker betalning via plattformen. Pengarna reserveras vid bokning och släpps till taskern först när uppdraget är slutfört och godkänt." },
+  { q: "Hur fungerar betalning?", a: "Moas är byggt för säker betalning via plattformen. Pengarna reserveras vid bokning och släpps till taskern först när uppdraget är slutfört och godkänt." },
   { q: "Hur blir jag tasker?", a: "Skapa ett konto, gå till 'Bli tasker', fyll i din profil, välj kategorier och verifiera din identitet. När din profil är klar kan du börja ta emot uppdrag." },
   { q: "Vad händer om något går fel?", a: "Kontakta först din motpart via chatten. Om ni inte hittar en lösning kan du rapportera ärendet och vårt team hjälper dig att lösa tvisten." },
-  { q: "Kan företag använda Taskly?", a: "Taskly är i första hand byggt för B2C – privatpersoner som vill ha hjälp med vardagliga fysiska uppdrag. Företag kan använda tjänsten i samma omfattning som privatpersoner." },
-  { q: "Är Taskly tillgängligt i hela Sverige?", a: "Ja, Taskly fungerar i hela Sverige. Tillgången på taskers varierar dock per stad – större städer har generellt fler aktiva taskers." },
+  { q: "Kan företag använda Moas?", a: "Moas är i första hand byggt för B2C – privatpersoner som vill ha hjälp med vardagliga fysiska uppdrag. Företag kan använda tjänsten i samma omfattning som privatpersoner." },
+  { q: "Är Moas tillgängligt i hela Sverige?", a: "Ja, Moas fungerar i hela Sverige. Tillgången på taskers varierar dock per stad – större städer har generellt fler aktiva taskers." },
 ];
 
 const StepCard = ({ step, index }: { step: Step; index: number }) => (
@@ -156,7 +156,7 @@ const HowItWorks = () => {
       {/* Hero */}
       <section className="bg-primary py-16 md:py-24">
         <div className="container text-center max-w-3xl">
-          <Badge variant="accent" className="mb-4">Så fungerar Taskly</Badge>
+          <Badge variant="accent" className="mb-4">Så fungerar Moas</Badge>
           <h1 className="text-4xl md:text-5xl font-bold font-display text-primary-foreground mb-4 leading-tight">
             Få hjälp med vardagens uppdrag, tryggt och enkelt
           </h1>
@@ -229,7 +229,7 @@ const HowItWorks = () => {
               Byggt för trygghet i varje uppdrag
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Verifieringar, omdömen och säker betalning gör Taskly till en plats där du kan lita på personen du möter.
+              Verifieringar, omdömen och säker betalning gör Moas till en plats där du kan lita på personen du möter.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

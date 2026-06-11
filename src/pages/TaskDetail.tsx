@@ -369,7 +369,7 @@ const TaskDetail = () => {
                     subtitle={
                       customerProfile.rating_count
                         ? `${customerProfile.rating_count} recensioner`
-                        : "Ny på Taskly"
+                        : "Ny på Moas"
                     }
                   />
                 </div>

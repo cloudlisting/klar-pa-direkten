@@ -12,7 +12,7 @@ const Footer = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <span className="text-sm font-bold text-primary-foreground">T</span>
               </div>
-              <span className="text-lg font-bold font-display text-foreground">Taskly</span>
+              <span className="text-lg font-bold font-display text-foreground">Moas</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {t("footer.tagline")}

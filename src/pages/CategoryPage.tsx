@@ -71,7 +71,7 @@ const CategoryPage = () => {
   return (
     <Layout>
       {/* SEO meta tags are handled in the component */}
-      <title>{`${categoryName} | Hitta hjälp med ${categoryName.toLowerCase()} | Taskly`}</title>
+      <title>{`${categoryName} | Hitta hjälp med ${categoryName.toLowerCase()} | Moas`}</title>
       <meta name="description" content={`Hitta kvalificerade taskers för ${categoryName.toLowerCase()} i Sverige. Jämför priser och recensioner. Boka enkelt online.`} />
 
       <div className="bg-secondary/50 border-b border-border">
