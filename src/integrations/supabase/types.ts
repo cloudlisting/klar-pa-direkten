@@ -190,21 +190,25 @@ export type Database = {
           bankid_verified: boolean
           bio: string | null
           cancelled_tasks: number
+          city: string | null
           completed_tasks: number
           completion_rate: number
           created_at: string
           email: string
           email_verified: boolean
+          google_connected: boolean
           id: string
           id_verified: boolean
           is_deactivated: boolean
           name: string
+          onboarding_completed: boolean
           phone: string | null
           phone_verified: boolean
           rating_avg: number
           rating_count: number
           referral_code: string | null
           response_time_minutes: number | null
+          role: Database["public"]["Enums"]["user_role_kind"] | null
           updated_at: string
         }
         Insert: {
@@ -212,21 +216,25 @@ export type Database = {
           bankid_verified?: boolean
           bio?: string | null
           cancelled_tasks?: number
+          city?: string | null
           completed_tasks?: number
           completion_rate?: number
           created_at?: string
           email: string
           email_verified?: boolean
+          google_connected?: boolean
           id: string
           id_verified?: boolean
           is_deactivated?: boolean
           name: string
+          onboarding_completed?: boolean
           phone?: string | null
           phone_verified?: boolean
           rating_avg?: number
           rating_count?: number
           referral_code?: string | null
           response_time_minutes?: number | null
+          role?: Database["public"]["Enums"]["user_role_kind"] | null
           updated_at?: string
         }
         Update: {
@@ -234,21 +242,25 @@ export type Database = {
           bankid_verified?: boolean
           bio?: string | null
           cancelled_tasks?: number
+          city?: string | null
           completed_tasks?: number
           completion_rate?: number
           created_at?: string
           email?: string
           email_verified?: boolean
+          google_connected?: boolean
           id?: string
           id_verified?: boolean
           is_deactivated?: boolean
           name?: string
+          onboarding_completed?: boolean
           phone?: string | null
           phone_verified?: boolean
           rating_avg?: number
           rating_count?: number
           referral_code?: string | null
           response_time_minutes?: number | null
+          role?: Database["public"]["Enums"]["user_role_kind"] | null
           updated_at?: string
         }
         Relationships: []
@@ -656,6 +668,7 @@ export type Database = {
         | "paid"
         | "cancelled"
         | "disputed"
+      user_role_kind: "bestallare" | "tasker" | "foretag"
       verification_state: "pending" | "verified" | "rejected"
       verification_status: "none" | "pending" | "verified"
       verification_type: "bankid" | "id" | "phone" | "email"
@@ -811,6 +824,7 @@ export const Constants = {
         "cancelled",
         "disputed",
       ],
+      user_role_kind: ["bestallare", "tasker", "foretag"],
       verification_state: ["pending", "verified", "rejected"],
       verification_status: ["none", "pending", "verified"],
       verification_type: ["bankid", "id", "phone", "email"],
