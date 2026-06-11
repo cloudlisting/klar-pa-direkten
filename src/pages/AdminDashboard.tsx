@@ -223,6 +223,7 @@ const AdminDashboard = () => {
                 <thead className="bg-muted">
                   <tr>
                     <th className="text-left p-3 font-medium">Användare</th>
+                    <th className="text-center p-3 font-medium">🔗 Google</th>
                     <th className="text-center p-3 font-medium">🟢 BankID</th>
                     <th className="text-center p-3 font-medium">🪪 ID</th>
                     <th className="text-center p-3 font-medium">📞 Telefon</th>
@@ -237,6 +238,11 @@ const AdminDashboard = () => {
                           {u.name}
                         </Link>
                         <p className="text-xs text-muted-foreground">{u.email}</p>
+                      </td>
+                      <td className="p-3 text-center">
+                        <span className={u.google_connected ? "text-success font-medium" : "text-muted-foreground"}>
+                          {u.google_connected ? "✅ Anslutet" : "—"}
+                        </span>
                       </td>
                       {(["bankid_verified", "id_verified", "phone_verified", "email_verified"] as const).map(
                         (f) => (
