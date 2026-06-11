@@ -53,7 +53,7 @@ const sv: Dict = {
   "step3.title": "3. Välj och få det gjort",
   "step3.desc": "Acceptera ett bud, betala säkert via plattformen och lämna ett omdöme.",
   // Footer
-  "footer.tagline": "Sveriges marknadsplats för vardagstjänster. Hitta hjälp eller hjälp andra.",
+  "footer.tagline": "Få saker gjorda nära dig. Moas är en svensk marknadsplats för lokala uppdrag, ärenden, hemtjänster, återvinning, hämtningar och vardagsjobb.",
   "footer.forCustomers": "För kunder",
   "footer.forTaskers": "För taskers",
   "footer.company": "Företag",
