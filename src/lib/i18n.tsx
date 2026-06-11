@@ -116,7 +116,7 @@ const en: Dict = {
   "step2.desc": "Local taskers send their offers. Compare price, ratings and experience.",
   "step3.title": "3. Choose and get it done",
   "step3.desc": "Accept an offer, pay securely on the platform, and leave a review.",
-  "footer.tagline": "Sweden's marketplace for everyday services. Find help or help others.",
+  "footer.tagline": "Get things done near you. Moas is a Swedish marketplace for local tasks, errands, home services, recycling, pickups and everyday jobs.",
   "footer.forCustomers": "For customers",
   "footer.forTaskers": "For taskers",
   "footer.company": "Company",
