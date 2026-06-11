@@ -194,6 +194,7 @@ const BrowseTasks = () => {
                         id_verified: task.poster.id_verified,
                         phone_verified: task.poster.phone_verified,
                         email_verified: task.poster.email_verified,
+                        google_connected: task.poster.google_connected,
                       }
                     : undefined,
                 }}

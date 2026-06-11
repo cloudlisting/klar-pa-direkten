@@ -11,6 +11,7 @@ export interface TrustData {
   id_verified?: boolean | null;
   phone_verified?: boolean | null;
   email_verified?: boolean | null;
+  google_connected?: boolean | null;
 }
 
 interface Props {
@@ -85,6 +86,9 @@ const TrustBadges = ({ data, size = "md", showAll = false, className }: Props) =
         <Pill tone="primary" size={size}>
           <Zap size={12} /> Svarar inom {rt} min
         </Pill>
+      )}
+      {data.google_connected && (
+        <Pill tone="info" size={size}>✅ Google-konto anslutet</Pill>
       )}
       {data.bankid_verified && (
         <Pill tone="success" size={size}>🟢 BankID</Pill>

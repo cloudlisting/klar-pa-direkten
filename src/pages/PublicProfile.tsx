@@ -56,8 +56,7 @@ const PublicProfile = () => {
   const verifiedCount =
     Number(profile.bankid_verified) +
     Number(profile.id_verified) +
-    Number(profile.phone_verified) +
-    Number(profile.email_verified);
+    Number(profile.phone_verified);
 
   return (
     <Layout>
