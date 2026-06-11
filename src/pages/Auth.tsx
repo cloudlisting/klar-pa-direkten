@@ -50,6 +50,21 @@ const Auth = () => {
     }
   };
 
+  const handleGoogle = async () => {
+    setLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/dashboard",
+      });
+      if (result.error) throw result.error;
+      if (result.redirected) return;
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast.error(error.message || "Kunde inte logga in med Google");
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="container max-w-md py-16">
