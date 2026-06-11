@@ -123,7 +123,7 @@ const BrowseTasks = () => {
             <div className="mt-4 flex flex-wrap gap-3 items-end">
               <div className="w-48">
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Kategori</label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <Select value={selectedCategory} onValueChange={(v) => { setSelectedCategory(v); const next = new URLSearchParams(searchParams); if (v === "all") next.delete("category"); else next.set("category", v); setSearchParams(next, { replace: true }); }}>
                   <SelectTrigger>
                     <SelectValue placeholder="Alla kategorier" />
                   </SelectTrigger>
