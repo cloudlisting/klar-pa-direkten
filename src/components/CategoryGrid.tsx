@@ -3,15 +3,16 @@ import { Link } from "react-router-dom";
 
 const CategoryGrid = () => {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {CATEGORIES.map((cat) => (
         <Link
           key={cat.id}
           to={`/browse?category=${cat.id}`}
-          className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-5 text-center shadow-card transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30"
+          className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-6 text-center shadow-card transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40"
+          title={(cat as any).desc}
         >
           <span className="text-3xl">{cat.icon}</span>
-          <span className="text-sm font-medium text-foreground">{cat.name}</span>
+          <span className="text-sm font-medium text-foreground leading-tight">{cat.name}</span>
         </Link>
       ))}
     </div>
