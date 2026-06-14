@@ -237,7 +237,7 @@ const Index = () => {
               </div>
             ) : (
               <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-2 snap-x snap-mandatory">
-                {nearbyTasks.slice(0, 6).map((task) => {
+                {nearbyTasks.slice(0, 3).map((task) => {
                   const budget = task.budget_max_sek || task.budget_min_sek || 0;
                   const isUrgent =
                     task.preferred_date &&
