@@ -79,8 +79,8 @@ const Auth = () => {
             </h1>
             <p className="text-sm text-muted-foreground">
               {isLogin
-                ? "Välkommen tillbaka till Taskly"
-                : "Kom igång med att använda Taskly"}
+                ? "Välkommen tillbaka till Moas"
+                : "Kom igång med att använda Moas"}
             </p>
           </div>
 

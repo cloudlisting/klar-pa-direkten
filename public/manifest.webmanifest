@@ -1,0 +1,16 @@
+{
+  "name": "Moas",
+  "short_name": "Moas",
+  "description": "Få saker gjorda nära dig. Svensk marknadsplats för lokala uppdrag.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf9f6",
+  "theme_color": "#1f8a82",
+  "lang": "sv",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
