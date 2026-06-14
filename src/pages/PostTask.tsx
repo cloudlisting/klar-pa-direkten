@@ -169,7 +169,7 @@ const PostTask = () => {
         .single();
       if (error) throw error;
 
-      await uploadPhotos(data.id);
+      await uploadPhotos(data.id, uid);
       setCreatedTaskId(data.id);
       toast.success("Uppdraget är publicerat!");
     } catch (e: any) {
