@@ -1,8 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut, Settings, LayoutDashboard, Shield, MessageSquare, MapPin, ChevronDown } from "lucide-react";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { User, LogOut, Settings, LayoutDashboard, Shield, MessageSquare, MapPin, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useT } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -15,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Header = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user, isAdmin, signOut } = useAuth();
   const t = useT();
@@ -148,92 +145,8 @@ const Header = () => {
               </>
             )}
           </div>
-
-          {/* Mobile toggle (only on desktop breakpoint for tablet, but hidden since we have mobile header) */}
-          <div className="flex items-center gap-2 md:hidden">
-            <LanguageSwitcher />
-            <button
-              className="rounded-lg p-2 text-muted-foreground hover:bg-secondary"
-              onClick={() => setMobileOpen(!mobileOpen)}
-            >
-              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
-          </div>
         </div>
       </div>
-
-      {/* Mobile menu (overlay) */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="border-t border-border bg-card md:hidden overflow-hidden"
-          >
-            <nav className="container flex flex-col gap-1 py-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              {user ? (
-                <>
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  >
-                    {t("nav.dashboard")}
-                  </Link>
-                  <Link
-                    to="/messages"
-                    onClick={() => setMobileOpen(false)}
-                    className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  >
-                    {t("nav.messages")}
-                  </Link>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setMobileOpen(false)}
-                      className="rounded-lg px-4 py-3 text-sm font-medium text-destructive hover:bg-secondary"
-                    >
-                      {t("nav.admin")}
-                    </Link>
-                  )}
-                  <div className="mt-2 border-t border-border pt-2">
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start"
-                      onClick={() => {
-                        signOut();
-                        setMobileOpen(false);
-                      }}
-                    >
-                      {t("nav.logout")}
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
-                  <Button variant="ghost" className="justify-start" asChild>
-                    <Link to="/auth" onClick={() => setMobileOpen(false)}>{t("nav.login")}</Link>
-                  </Button>
-                  <Button variant="hero" asChild>
-                    <Link to="/auth" onClick={() => setMobileOpen(false)}>{t("nav.getStarted")}</Link>
-                  </Button>
-                </div>
-              )}
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   );
 };
