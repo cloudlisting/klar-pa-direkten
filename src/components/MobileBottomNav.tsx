@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, Plus, MessageSquare, User } from "lucide-react";
+import { Home, Search, Plus, MessageSquare, User, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const HIDDEN_PATHS = [/^\/auth/, /^\/onboarding/, /^\/checkout\//];
@@ -8,8 +8,8 @@ const items = [
   { to: "/", icon: Home, label: "Hem", match: (p: string) => p === "/" },
   { to: "/browse", icon: Search, label: "Uppdrag", match: (p: string) => p.startsWith("/browse") || p.startsWith("/task/") },
   { to: "/post-task", icon: Plus, label: "Skapa", center: true, match: (p: string) => p.startsWith("/post-task") },
-  { to: "/messages", icon: MessageSquare, label: "Meddelanden", match: (p: string) => p.startsWith("/messages") },
-  { to: "/dashboard", icon: User, label: "Profil", match: (p: string) => p.startsWith("/dashboard") || p.startsWith("/settings") || p.startsWith("/my-tasks") },
+  { to: "/my-tasks", icon: ClipboardList, label: "Mina uppdrag", match: (p: string) => p.startsWith("/my-tasks") },
+  { to: "/dashboard", icon: User, label: "Profil", match: (p: string) => p.startsWith("/dashboard") || p.startsWith("/settings") },
 ];
 
 const MobileBottomNav = () => {
