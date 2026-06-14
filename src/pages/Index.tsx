@@ -123,69 +123,79 @@ const Index = () => {
     <Layout>
       {/* ============ MOBILE APP HOME ============ */}
       <section className="md:hidden">
-        <div className="px-5 pt-4 pb-6">
-          {/* Hero text + image */}
-          <div className="flex items-start justify-between gap-4 mb-5">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-[28px] font-bold font-display text-foreground leading-[1.15] mb-3">
-                Vad behöver du hjälp med idag?
-              </h1>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Skapa ett uppdrag på mindre än en minut och få svar från lokala utförare.
-              </p>
-            </div>
-            <div className="shrink-0 w-[140px] h-[140px] relative">
+        <div className="px-5 pt-3 pb-6">
+          {/* Hero — text with overlapping image blob on right */}
+          <div className="relative mb-6">
+            {/* Image blob */}
+            <div className="absolute -top-2 -right-4 w-[180px] h-[200px] pointer-events-none">
+              <div className="absolute inset-0 bg-primary/10 rounded-[50%_45%_55%_50%/55%_50%_50%_45%]" />
               <img
                 src={heroImage}
                 alt="Inredning"
-                className="w-full h-full object-cover rounded-2xl"
-                width={140}
-                height={140}
+                className="absolute inset-0 w-full h-full object-contain"
               />
             </div>
+
+            <div className="relative z-10 max-w-[62%]">
+              <h1 className="text-[30px] font-bold font-display text-foreground leading-[1.1] mb-3">
+                Vad behöver du hjälp med idag?
+              </h1>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
+                Skapa ett uppdrag på mindre än en minut och få svar från lokala utförare.
+              </p>
+            </div>
           </div>
 
-          {/* CTA buttons */}
-          <div className="flex gap-3 mb-8">
+          {/* CTA buttons — primary wide + secondary pill */}
+          <div className="flex items-center gap-2 mb-7">
             <Button
-              variant="hero"
               size="lg"
-              className="flex-1 h-12 gap-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-xl"
+              className="flex-1 h-12 gap-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-2xl text-[15px] font-semibold shadow-sm"
               onClick={() => navigate("/post-task")}
             >
-              <Plus size={20} strokeWidth={2.5} />
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/25">
+                <Plus size={16} strokeWidth={3} />
+              </span>
               Skapa uppdrag
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="flex-1 h-12 gap-2 rounded-xl border-border"
+            <button
               onClick={() => navigate("/browse")}
+              className="flex items-center gap-2 h-12 px-4 rounded-2xl bg-card border border-border text-[13px] font-medium text-foreground shadow-sm active:scale-[0.97] transition-transform"
             >
-              <MapPin size={18} />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background">
+                <MapPin size={14} />
+              </span>
               Se uppdrag nära dig
-            </Button>
+            </button>
           </div>
 
-          {/* Trust badges */}
+          {/* Trust cards */}
           <div className="grid grid-cols-3 gap-2 mb-8">
-            <div className="rounded-xl border border-border bg-card p-3 text-center">
-              <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <Shield size={16} className="text-primary" />
+            <div className="rounded-2xl border border-border bg-card p-3">
+              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+                <Shield size={18} className="text-primary-foreground" />
               </div>
               <p className="text-[11px] font-semibold text-foreground leading-tight">Verifierade profiler</p>
-              <p className="text-[10px] text-muted-foreground mt-1 leading-tight">Endast kontrollerade utförare.</p>
+              <p className="text-[10px] text-muted-foreground mt-1 leading-tight mb-2">Endast kontrollerade utförare.</p>
+              <span className="inline-block text-[9px] font-bold tracking-tight text-foreground bg-secondary px-1.5 py-0.5 rounded">
+                BankID
+              </span>
             </div>
-            <div className="rounded-xl border border-border bg-card p-3 text-center">
-              <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <Zap size={16} className="text-primary" />
+            <div className="rounded-2xl border border-border bg-card p-3">
+              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+                <Shield size={18} className="text-primary-foreground" />
               </div>
               <p className="text-[11px] font-semibold text-foreground leading-tight">Säker betalning</p>
-              <p className="text-[10px] text-muted-foreground mt-1 leading-tight">Betala tryggt direkt i appen.</p>
+              <p className="text-[10px] text-muted-foreground mt-1 leading-tight mb-2">Betala tryggt direkt i appen.</p>
+              <div className="flex items-center gap-1 text-[8px] font-semibold text-muted-foreground">
+                <span className="bg-secondary px-1 py-0.5 rounded">Swish</span>
+                <span className="bg-secondary px-1 py-0.5 rounded">MC</span>
+                <span className="bg-secondary px-1 py-0.5 rounded">Klarna</span>
+              </div>
             </div>
-            <div className="rounded-xl border border-border bg-card p-3 text-center">
-              <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <Star size={16} className="text-primary" />
+            <div className="rounded-2xl border border-border bg-card p-3">
+              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+                <Star size={18} className="text-primary-foreground" />
               </div>
               <p className="text-[11px] font-semibold text-foreground leading-tight">Omdömen efter varje uppdrag</p>
               <p className="text-[10px] text-muted-foreground mt-1 leading-tight">Riktiga betyg från riktiga kunder.</p>
@@ -227,7 +237,7 @@ const Index = () => {
               </div>
             ) : (
               <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-2 snap-x snap-mandatory">
-                {nearbyTasks.slice(0, 6).map((task) => {
+                {nearbyTasks.slice(0, 3).map((task) => {
                   const budget = task.budget_max_sek || task.budget_min_sek || 0;
                   const isUrgent =
                     task.preferred_date &&
