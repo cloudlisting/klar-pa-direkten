@@ -288,6 +288,11 @@ const Checkout = () => {
                 <>
                   <CreditCard size={18} />
                   Bekräfta och betala {fees.taskPrice.toLocaleString("sv-SE")} kr
+                </>
+              )}
+            </Button>
+
+
 
             <p className="text-xs text-muted-foreground text-center mt-4">
               Genom att klicka godkänner du våra{" "}
