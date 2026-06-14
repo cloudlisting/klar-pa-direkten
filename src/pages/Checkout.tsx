@@ -251,39 +251,14 @@ const Checkout = () => {
 
             <Separator className="my-6" />
 
-            {/* Price breakdown - Two-sided fees */}
+            {/* Price breakdown - customer only sees task price */}
             <div className="space-y-3 mb-6">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Uppdraget</span>
-                <span className="text-foreground font-medium">
+              <div className="flex justify-between text-lg">
+                <span className="font-semibold text-foreground">Uppdragspris</span>
+                <span className="font-bold text-foreground">
                   {fees.taskPrice.toLocaleString("sv-SE")} kr
                 </span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground flex items-center gap-1">
-                  Serviceavgift ({Math.round(CUSTOMER_FEE_PERCENT * 100)}%)
-                </span>
-                <span className="text-foreground font-medium">
-                  {fees.customerFee.toLocaleString("sv-SE")} kr
-                </span>
-              </div>
-              <Separator />
-              <div className="flex justify-between text-lg">
-                <span className="font-semibold text-foreground">Totalt att betala</span>
-                <span className="font-bold text-foreground">
-                  {fees.totalCustomerCharge.toLocaleString("sv-SE")} kr
-                </span>
-              </div>
-            </div>
-
-            {/* Tasker payout info */}
-            <div className="rounded-lg bg-muted/50 p-4 mb-6 text-sm">
-              <p className="text-muted-foreground">
-                <strong>Tasker får:</strong> {fees.totalTaskerPayout.toLocaleString("sv-SE")} kr 
-                <span className="text-xs ml-1">
-                  (efter {Math.round(TASKER_FEE_PERCENT * 100)}% plattformsavgift)
-                </span>
-              </p>
             </div>
 
             {/* Escrow info */}
@@ -312,10 +287,12 @@ const Checkout = () => {
               ) : (
                 <>
                   <CreditCard size={18} />
-                  Bekräfta och betala {fees.totalCustomerCharge.toLocaleString("sv-SE")} kr
+                  Bekräfta och betala {fees.taskPrice.toLocaleString("sv-SE")} kr
                 </>
               )}
             </Button>
+
+
 
             <p className="text-xs text-muted-foreground text-center mt-4">
               Genom att klicka godkänner du våra{" "}

@@ -1,0 +1,6 @@
+ALTER TABLE public.tasks
+  ADD COLUMN IF NOT EXISTS address_text TEXT,
+  ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS location_confirmed BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS timing_type TEXT NOT NULL DEFAULT 'scheduled' CHECK (timing_type IN ('asap','scheduled'));

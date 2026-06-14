@@ -136,12 +136,7 @@ const HeroTaskFeed = () => {
                     <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
                       {task.category}
                     </Badge>
-                    {isInstant && (
-                      <Badge variant="accent" className="text-[10px] h-4 px-1 gap-0.5">
-                        <Zap size={8} />
-                        {t("common.instant")}
-                      </Badge>
-                    )}
+                    {/* instant badge removed for MVP */}
                     {isUrgent && (
                       <Badge variant="destructive" className="text-[10px] h-4 px-1">
                         {t("feed.urgent")}

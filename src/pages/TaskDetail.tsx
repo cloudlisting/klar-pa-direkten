@@ -334,9 +334,7 @@ const TaskDetail = () => {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               <div className="flex flex-wrap gap-2 mb-3">
                 <Badge variant="secondary">{task.category}</Badge>
-                {taskStatus === "instant_open" && (
-                  <Badge variant="accent" className="gap-1"><Zap size={10} /> Direktbokning</Badge>
-                )}
+                {/* Direktbokning removed for MVP — request & approval flow only */}
                 <Badge variant="success">{TASK_STATUS_LABELS[task.status] || task.status}</Badge>
               </div>
               <h1 className="text-2xl font-bold font-display text-foreground mb-4">
@@ -376,41 +374,7 @@ const TaskDetail = () => {
               )}
             </motion.div>
 
-            {/* Instant Accept for Taskers */}
-            {canInstantAccept && autoAcceptPrice && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }} 
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl border-2 border-accent bg-accent/5 p-6"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-accent/20 flex items-center justify-center">
-                    <Zap className="text-accent" size={24} />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-foreground mb-1">Direktbokning tillgänglig!</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Acceptera detta uppdrag direkt för {autoAcceptPrice.toLocaleString("sv-SE")} kr. 
-                      Du får {calculateFees(autoAcceptPrice).totalTaskerPayout.toLocaleString("sv-SE")} kr efter avgift.
-                    </p>
-                    <Button 
-                      variant="accent" 
-                      size="lg" 
-                      className="gap-2"
-                      onClick={handleInstantAccept}
-                      disabled={instantAccepting}
-                    >
-                      {instantAccepting ? "Accepterar..." : (
-                        <>
-                          <CheckCircle size={18} />
-                          Acceptera nu för {autoAcceptPrice.toLocaleString("sv-SE")} kr
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+            {/* Direktbokning UI removed for MVP */}
 
             {/* Offers section */}
             {(isOwner || hasOffered) && (
@@ -646,33 +610,15 @@ const TaskDetail = () => {
                   {price.toLocaleString("sv-SE")} kr
                 </p>
                 <p className="text-sm text-muted-foreground">Fast pris</p>
-                
-                {autoAcceptPrice && taskStatus === "instant_open" && (
-                  <div className="mt-2 inline-flex items-center gap-1 text-sm text-accent font-medium">
-                    <Zap size={14} />
-                    Direktbokning: {autoAcceptPrice.toLocaleString("sv-SE")} kr
-                  </div>
-                )}
               </div>
 
               {!user && (
                 <Button variant="hero" size="lg" className="w-full mb-3" asChild>
-                  <Link to="/auth">Logga in för att lägga bud</Link>
+                  <Link to="/auth">Logga in för att skicka förfrågan</Link>
                 </Button>
               )}
 
-              {canInstantAccept && autoAcceptPrice && (
-                <Button
-                  variant="accent"
-                  size="lg"
-                  className="w-full mb-3 gap-2"
-                  onClick={handleInstantAccept}
-                  disabled={instantAccepting}
-                >
-                  <Zap size={16} />
-                  Acceptera direkt
-                </Button>
-              )}
+
 
               {user && !isOwner && isTasker && !hasOffered && !canInstantAccept && (taskStatus === "published" || taskStatus === "instant_open") && (
                 <Button

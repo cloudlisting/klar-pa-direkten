@@ -3,96 +3,167 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CATEGORIES, SWEDISH_CITIES, calculateFees, CUSTOMER_FEE_PERCENT } from "@/lib/constants";
-import { useState, useEffect } from "react";
-import { ArrowRight, ArrowLeft, Upload, Check, Zap, Info } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Upload, MapPin, Loader2, Check, X, Clock } from "lucide-react";
+import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { SWEDISH_CITIES } from "@/lib/constants";
+
+type TimingType = "asap" | "scheduled";
+
+const DEFAULT_CATEGORY = "Övrigt";
 
 const PostTask = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const [step, setStep] = useState(1);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [submitting, setSubmitting] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    title: "",
-    category: "",
-    description: "",
-    city: "",
-    address: "",
-    date: "",
-    time: "",
-    fixedPrice: "",
-    autoAcceptEnabled: false,
-    autoAcceptPrice: "",
-  });
+  const [createdTaskId, setCreatedTaskId] = useState<string | null>(null);
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+
+  // Location
+  const [addressText, setAddressText] = useState("");
+  const [city, setCity] = useState("");
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [locationConfirmed, setLocationConfirmed] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
+
+  // Timing
+  const [timingType, setTimingType] = useState<TimingType>("asap");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+
+  const [price, setPrice] = useState("");
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    }
+    if (!loading && !user) navigate("/auth");
   }, [user, loading, navigate]);
 
-  const handleSubmit = async () => {
-    if (!user) {
-      navigate("/auth");
+  const handlePhotos = (files: FileList | null) => {
+    if (!files) return;
+    const arr = Array.from(files).slice(0, 5 - photos.length);
+    setPhotos((p) => [...p, ...arr]);
+    setPhotoPreviews((p) => [...p, ...arr.map((f) => URL.createObjectURL(f))]);
+  };
+
+  const removePhoto = (i: number) => {
+    setPhotos((p) => p.filter((_, idx) => idx !== i));
+    setPhotoPreviews((p) => p.filter((_, idx) => idx !== i));
+  };
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Din enhet stöder inte platsdelning. Fyll i platsen manuellt.");
       return;
     }
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setLat(latitude);
+        setLng(longitude);
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&accept-language=sv`,
+            { headers: { "Accept": "application/json" } }
+          );
+          const data = await res.json();
+          const addr = data.address || {};
+          const street = [addr.road, addr.house_number].filter(Boolean).join(" ");
+          const guessedCity =
+            addr.city || addr.town || addr.village || addr.municipality || "";
+          if (street) setAddressText(street);
+          else if (data.display_name) setAddressText(data.display_name.split(",")[0]);
+          if (guessedCity) {
+            const match = SWEDISH_CITIES.find(
+              (c) => c.toLowerCase() === guessedCity.toLowerCase()
+            );
+            setCity(match || guessedCity);
+          }
+          setLocationConfirmed(false);
+          toast.success("Plats hittad – kontrollera och bekräfta.");
+        } catch {
+          toast.message("Plats hittad. Fyll i adress och stad om de saknas.");
+        } finally {
+          setGpsLoading(false);
+        }
+      },
+      () => {
+        setGpsLoading(false);
+        toast.error("Kunde inte hämta platsen. Fyll i manuellt.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
-    setSubmitting(true);
-    try {
-      const price = parseInt(formData.fixedPrice);
-      const autoAcceptPrice = formData.autoAcceptEnabled && formData.autoAcceptPrice 
-        ? parseInt(formData.autoAcceptPrice) 
-        : null;
-      
-      // Determine status based on auto-accept
-      const status = autoAcceptPrice ? "instant_open" : "published";
+  const canSubmit =
+    title.trim().length > 2 &&
+    description.trim().length > 2 &&
+    city.trim().length > 0 &&
+    parseInt(price) >= 1 &&
+    (timingType === "asap" || (date && time));
 
-      const { error } = await supabase.from("tasks").insert({
-        customer_user_id: user.id,
-        title: formData.title,
-        category: formData.category,
-        description: formData.description,
-        city: formData.city,
-        address_optional: formData.address || null,
-        preferred_date: formData.date || null,
-        preferred_time: formData.time || null,
-        budget_type: "fixed" as const,
-        budget_min_sek: price,
-        budget_max_sek: price,
-        // auto_accept_price_sek will be available after types regenerate
-        is_remote_possible: false,
-        status: status as "published" | "instant_open",
-      } as any);
-
-      if (error) throw error;
-
-      toast.success("Uppdraget har publicerats!", { 
-        description: autoAcceptPrice 
-          ? "Taskers kan nu acceptera direkt!" 
-          : "Taskers kan nu lägga bud." 
-      });
-      navigate("/my-tasks");
-    } catch (error: any) {
-      toast.error(error.message || "Något gick fel");
-    } finally {
-      setSubmitting(false);
+  const uploadPhotos = async (taskId: string) => {
+    if (!photos.length || !user) return;
+    for (const file of photos) {
+      const path = `${user.id}/${taskId}/${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage
+        .from("task-photos")
+        .upload(path, file, { upsert: false });
+      if (error) continue;
+      const { data } = supabase.storage.from("task-photos").getPublicUrl(path);
+      await supabase.from("task_photos").insert({ task_id: taskId, url: data.publicUrl });
     }
   };
 
-  const canProceed = (currentStep: number) => {
-    if (currentStep === 1) return formData.title && formData.category;
-    if (currentStep === 2) return formData.description;
-    if (currentStep === 3) return formData.city;
-    if (currentStep === 4) return formData.fixedPrice && parseInt(formData.fixedPrice) >= 100;
-    return true;
+  const handleSubmit = async () => {
+    if (!user || !canSubmit) return;
+    setSubmitting(true);
+    try {
+      const priceNum = parseInt(price);
+      const { data, error } = await supabase
+        .from("tasks")
+        .insert({
+          customer_user_id: user.id,
+          title: title.trim(),
+          category: DEFAULT_CATEGORY,
+          description: description.trim(),
+          city: city.trim(),
+          address_optional: addressText.trim() || null,
+          address_text: addressText.trim() || null,
+          latitude: lat,
+          longitude: lng,
+          location_confirmed: locationConfirmed,
+          timing_type: timingType,
+          preferred_date: timingType === "scheduled" ? date : null,
+          preferred_time: timingType === "scheduled" ? time : null,
+          budget_type: "fixed" as const,
+          budget_min_sek: priceNum,
+          budget_max_sek: priceNum,
+          is_remote_possible: false,
+          status: "published" as const,
+        } as any)
+        .select("id")
+        .single();
+      if (error) throw error;
+
+      await uploadPhotos(data.id);
+      setCreatedTaskId(data.id);
+      toast.success("Uppdraget är publicerat!");
+    } catch (e: any) {
+      toast.error(e.message || "Något gick fel");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -105,341 +176,226 @@ const PostTask = () => {
     );
   }
 
-  const price = parseInt(formData.fixedPrice) || 0;
-  const { customerFee, totalCustomerCharge } = calculateFees(price);
+  if (createdTaskId) {
+    return (
+      <Layout>
+        <div className="container max-w-md py-12 md:py-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="rounded-2xl border border-border bg-card p-8 text-center shadow-card"
+          >
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Check size={32} strokeWidth={2.5} />
+            </div>
+            <h1 className="text-2xl font-bold font-display text-foreground mb-2">
+              Ditt uppdrag är publicerat
+            </h1>
+            <p className="text-muted-foreground mb-6">
+              Utförare kan nu skicka förfrågningar.
+            </p>
+            <div className="space-y-3">
+              <Button variant="hero" size="lg" className="w-full" asChild>
+                <Link to={`/task/${createdTaskId}`}>Se mitt uppdrag</Link>
+              </Button>
+              <Button variant="outline" size="lg" className="w-full" asChild>
+                <Link to="/">Till startsidan</Link>
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      <div className="container max-w-2xl py-8 md:py-12">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          {/* Progress */}
-          <div className="flex items-center justify-center gap-2 mb-8">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <div
-                key={s}
-                className={`h-2 flex-1 max-w-12 rounded-full transition-colors ${
-                  s <= step ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            ))}
+      <div className="container max-w-xl py-6 md:py-12 px-4">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="mb-6">
+            <h1 className="text-2xl md:text-3xl font-bold font-display text-foreground mb-1">
+              Vad behöver du hjälp med?
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Beskriv uppdraget, välj plats och föreslå ett pris.
+            </p>
           </div>
 
-          <div className="rounded-xl border border-border bg-card p-6 md:p-8 shadow-card">
-            <AnimatePresence mode="wait">
-              {/* Step 1: Category + Title */}
-              {step === 1 && (
-                <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                  <h1 className="text-2xl font-bold font-display text-foreground mb-2">
-                    Vad behöver du hjälp med?
-                  </h1>
-                  <p className="text-muted-foreground mb-6">Steg 1 av 5: Kategori och titel</p>
+          <div className="space-y-6 rounded-2xl border border-border bg-card p-5 md:p-7 shadow-card">
+            {/* Titel */}
+            <div>
+              <Label htmlFor="title">Titel</Label>
+              <Input
+                id="title"
+                placeholder="T.ex. Hämta soffa från IKEA"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="mt-1.5 h-12 text-base"
+                maxLength={80}
+              />
+            </div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Kategori *</Label>
-                      <Select
-                        value={formData.category}
-                        onValueChange={(v) => setFormData({ ...formData, category: v })}
-                      >
-                        <SelectTrigger className="mt-1.5">
-                          <SelectValue placeholder="Välj kategori" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {CATEGORIES.map((cat) => (
-                            <SelectItem key={cat.id} value={cat.name}>
-                              {cat.icon} {cat.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="title">Titel *</Label>
-                      <Input
-                        id="title"
-                        placeholder="T.ex. Flytta möbler till ny lägenhet"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="mt-1.5"
-                      />
-                    </div>
+            {/* Beskrivning */}
+            <div>
+              <Label htmlFor="desc">Beskrivning</Label>
+              <Textarea
+                id="desc"
+                placeholder="Vad ska göras? Storlek, vikt, antal m.m."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="mt-1.5 min-h-[110px] text-base"
+              />
+            </div>
+
+            {/* Bilder */}
+            <div>
+              <Label>Ladda upp bilder (valfritt)</Label>
+              <div className="mt-1.5 grid grid-cols-3 gap-2">
+                {photoPreviews.map((src, i) => (
+                  <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-border">
+                    <img src={src} alt={`Bild ${i + 1}`} className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(i)}
+                      aria-label="Ta bort bild"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full bg-background/90 text-foreground flex items-center justify-center shadow"
+                    >
+                      <X size={14} />
+                    </button>
                   </div>
-                </motion.div>
-              )}
+                ))}
+                {photos.length < 5 && (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="aspect-square rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors"
+                  >
+                    <Upload size={18} />
+                    <span className="text-[11px] mt-1">Lägg till</span>
+                  </button>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => handlePhotos(e.target.files)}
+              />
+            </div>
 
-              {/* Step 2: Description + Photos */}
-              {step === 2 && (
-                <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                  <h1 className="text-2xl font-bold font-display text-foreground mb-2">
-                    Beskriv uppdraget
-                  </h1>
-                  <p className="text-muted-foreground mb-6">Steg 2 av 5: Beskrivning och bilder</p>
-
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="description">Beskrivning *</Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Beskriv uppdraget i detalj. Ju mer information, desto bättre bud får du."
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="mt-1.5 min-h-[150px]"
-                      />
-                    </div>
-                    <div className="rounded-lg border-2 border-dashed border-border p-6 text-center">
-                      <Upload className="mx-auto mb-2 text-muted-foreground" size={24} />
-                      <p className="text-sm text-muted-foreground">Ladda upp bilder (valfritt)</p>
-                      <p className="text-xs text-muted-foreground">Kommer snart</p>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Step 3: Location */}
-              {step === 3 && (
-                <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                  <h1 className="text-2xl font-bold font-display text-foreground mb-2">
-                    Var ska uppdraget utföras?
-                  </h1>
-                  <p className="text-muted-foreground mb-6">Steg 3 av 5: Plats</p>
-
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Stad *</Label>
-                      <Select
-                        value={formData.city}
-                        onValueChange={(v) => setFormData({ ...formData, city: v })}
-                      >
-                        <SelectTrigger className="mt-1.5">
-                          <SelectValue placeholder="Välj stad" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {SWEDISH_CITIES.map((city) => (
-                            <SelectItem key={city} value={city}>{city}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="address">Adress (valfritt)</Label>
-                      <Input
-                        id="address"
-                        placeholder="Gatuadress (delas med vald tasker)"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        className="mt-1.5"
-                      />
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <Label htmlFor="date">Önskat datum</Label>
-                        <Input
-                          id="date"
-                          type="date"
-                          value={formData.date}
-                          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                          className="mt-1.5"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="time">Önskad tid</Label>
-                        <Input
-                          id="time"
-                          type="time"
-                          value={formData.time}
-                          onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                          className="mt-1.5"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Step 4: Price + Auto-accept */}
-              {step === 4 && (
-                <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                  <h1 className="text-2xl font-bold font-display text-foreground mb-2">
-                    Sätt ditt pris
-                  </h1>
-                  <p className="text-muted-foreground mb-6">Steg 4 av 5: Fast pris och direktbokning</p>
-
-                  <div className="space-y-6">
-                    <div>
-                      <Label htmlFor="fixedPrice">Ditt pris (SEK) *</Label>
-                      <Input
-                        id="fixedPrice"
-                        type="number"
-                        placeholder="1000"
-                        min="100"
-                        value={formData.fixedPrice}
-                        onChange={(e) => setFormData({ ...formData, fixedPrice: e.target.value })}
-                        className="mt-1.5 text-lg"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Minst 100 kr. Taskers kan lägga egna bud.
-                      </p>
-                    </div>
-
-                    {price >= 100 && (
-                      <div className="rounded-lg bg-secondary/50 p-4 space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Ditt pris</span>
-                          <span className="font-medium">{price.toLocaleString("sv-SE")} kr</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Serviceavgift ({Math.round(CUSTOMER_FEE_PERCENT * 100)}%)</span>
-                          <span className="font-medium">{customerFee.toLocaleString("sv-SE")} kr</span>
-                        </div>
-                        <div className="flex justify-between pt-2 border-t border-border font-semibold">
-                          <span>Du betalar</span>
-                          <span>{totalCustomerCharge.toLocaleString("sv-SE")} kr</span>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="rounded-lg border border-accent/30 bg-accent/5 p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-3">
-                          <Zap className="text-accent mt-0.5" size={20} />
-                          <div>
-                            <Label htmlFor="autoAccept" className="text-base font-semibold">
-                              Aktivera direktbokning
-                            </Label>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Första kvalificerade tasker kan acceptera direkt – snabbaste sättet att få hjälp!
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          id="autoAccept"
-                          checked={formData.autoAcceptEnabled}
-                          onCheckedChange={(v) => setFormData({ ...formData, autoAcceptEnabled: v })}
-                        />
-                      </div>
-                      
-                      {formData.autoAcceptEnabled && (
-                        <div className="mt-4 pt-4 border-t border-accent/20">
-                          <Label htmlFor="autoAcceptPrice">Direktbokningspris (SEK)</Label>
-                          <Input
-                            id="autoAcceptPrice"
-                            type="number"
-                            placeholder={formData.fixedPrice || "1000"}
-                            min="100"
-                            value={formData.autoAcceptPrice}
-                            onChange={(e) => setFormData({ ...formData, autoAcceptPrice: e.target.value })}
-                            className="mt-1.5"
-                          />
-                          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                            <Info size={12} />
-                            Tasker i ditt område kan acceptera direkt till detta pris
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Step 5: Review */}
-              {step === 5 && (
-                <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                  <h1 className="text-2xl font-bold font-display text-foreground mb-2">
-                    Granska och publicera
-                  </h1>
-                  <p className="text-muted-foreground mb-6">Steg 5 av 5: Kontrollera uppgifterna</p>
-
-                  <div className="space-y-4">
-                    <div className="rounded-lg border border-border p-4 space-y-3">
-                      <div>
-                        <p className="text-xs text-muted-foreground">Kategori</p>
-                        <p className="font-medium text-foreground">{formData.category}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Titel</p>
-                        <p className="font-medium text-foreground">{formData.title}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Beskrivning</p>
-                        <p className="text-foreground text-sm">{formData.description}</p>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-xs text-muted-foreground">Plats</p>
-                          <p className="font-medium text-foreground">{formData.city}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">Pris</p>
-                          <p className="font-medium text-foreground">{price.toLocaleString("sv-SE")} kr</p>
-                        </div>
-                      </div>
-                      {formData.date && (
-                        <div>
-                          <p className="text-xs text-muted-foreground">Önskat datum</p>
-                          <p className="font-medium text-foreground">{formData.date}</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {formData.autoAcceptEnabled && formData.autoAcceptPrice && (
-                      <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 flex items-center gap-3">
-                        <Zap className="text-accent" size={20} />
-                        <div>
-                          <p className="font-semibold text-foreground">Direktbokning aktiverad</p>
-                          <p className="text-sm text-muted-foreground">
-                            Taskers kan acceptera direkt för {parseInt(formData.autoAcceptPrice).toLocaleString("sv-SE")} kr
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="rounded-lg bg-secondary/50 p-4 space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Uppdraget</span>
-                        <span className="font-medium">{price.toLocaleString("sv-SE")} kr</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Serviceavgift ({Math.round(CUSTOMER_FEE_PERCENT * 100)}%)</span>
-                        <span className="font-medium">{customerFee.toLocaleString("sv-SE")} kr</span>
-                      </div>
-                      <div className="flex justify-between pt-2 border-t border-border font-semibold text-base">
-                        <span>Total att betala</span>
-                        <span>{totalCustomerCharge.toLocaleString("sv-SE")} kr</span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Navigation */}
-            <div className="flex gap-3 mt-6">
-              {step > 1 && (
-                <Button variant="outline" onClick={() => setStep(step - 1)}>
-                  <ArrowLeft size={16} /> Tillbaka
-                </Button>
-              )}
-              {step < 5 ? (
-                <Button
-                  variant="hero"
-                  className="flex-1"
-                  onClick={() => setStep(step + 1)}
-                  disabled={!canProceed(step)}
-                >
-                  Fortsätt <ArrowRight size={16} />
-                </Button>
-              ) : (
-                <Button
-                  variant="hero"
-                  className="flex-1"
-                  onClick={handleSubmit}
-                  disabled={submitting}
-                >
-                  {submitting ? "Publicerar..." : "Publicera uppdrag"}
-                  <Check size={16} />
-                </Button>
+            {/* Plats */}
+            <div>
+              <Label>Plats</Label>
+              <p className="text-xs text-muted-foreground mt-1 mb-2">
+                Vi föreslår din plats automatiskt. Du kan ändra den innan du publicerar.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={useMyLocation}
+                disabled={gpsLoading}
+                className="w-full h-11 gap-2 mb-3"
+              >
+                {gpsLoading ? <Loader2 size={16} className="animate-spin" /> : <MapPin size={16} />}
+                {gpsLoading ? "Hämtar plats…" : "Använd min plats"}
+              </Button>
+              <Input
+                placeholder="Adress (valfritt)"
+                value={addressText}
+                onChange={(e) => { setAddressText(e.target.value); setLocationConfirmed(false); }}
+                className="h-11 mb-2"
+              />
+              <Input
+                placeholder="Stad"
+                value={city}
+                onChange={(e) => { setCity(e.target.value); setLocationConfirmed(false); }}
+                className="h-11"
+                list="city-list"
+              />
+              <datalist id="city-list">
+                {SWEDISH_CITIES.map((c) => <option key={c} value={c} />)}
+              </datalist>
+              {(addressText || city) && (
+                <label className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={locationConfirmed}
+                    onChange={(e) => setLocationConfirmed(e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                  Jag bekräftar platsen
+                </label>
               )}
             </div>
+
+            {/* Tid */}
+            <div>
+              <Label>Tid</Label>
+              <div className="mt-1.5 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTimingType("asap")}
+                  className={`h-12 rounded-lg border text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+                    timingType === "asap"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-background text-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <Clock size={16} /> Nu / snarast
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTimingType("scheduled")}
+                  className={`h-12 rounded-lg border text-sm font-medium transition-colors ${
+                    timingType === "scheduled"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-background text-foreground hover:border-primary/40"
+                  }`}
+                >
+                  Välj datum och tid
+                </button>
+              </div>
+              {timingType === "scheduled" && (
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-11" />
+                  <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="h-11" />
+                </div>
+              )}
+            </div>
+
+            {/* Pris */}
+            <div>
+              <Label htmlFor="price">Vad vill du föreslå för pris?</Label>
+              <div className="relative mt-1.5">
+                <Input
+                  id="price"
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  placeholder="500"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="h-12 text-lg pr-12"
+                />
+                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  kr
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="sticky bottom-0 left-0 right-0 mt-6 pb-safe">
+            <Button
+              variant="hero"
+              size="lg"
+              className="w-full h-13"
+              disabled={!canSubmit || submitting}
+              onClick={handleSubmit}
+            >
+              {submitting ? "Publicerar…" : "Publicera uppdrag"}
+            </Button>
           </div>
         </motion.div>
       </div>
