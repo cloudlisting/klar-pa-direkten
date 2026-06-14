@@ -113,15 +113,18 @@ const Auth = () => {
             </svg>
             Fortsätt med Google
           </Button>
+          )}
 
-          <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-            <div className="h-px flex-1 bg-border" />
-            eller
-            <div className="h-px flex-1 bg-border" />
-          </div>
+          {!isReset && (
+            <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="h-px flex-1 bg-border" />
+              eller
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+            {!isLogin && !isReset && (
               <div>
                 <Label htmlFor="name">Namn</Label>
                 <div className="relative mt-1.5">
@@ -153,22 +156,35 @@ const Auth = () => {
                 />
               </div>
             </div>
-            <div>
-              <Label htmlFor="password">Lösenord</Label>
-              <div className="relative mt-1.5">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                  required
-                  minLength={6}
-                />
+            {!isReset && (
+              <div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Lösenord</Label>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={() => setMode("reset")}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Glömt lösenord?
+                    </button>
+                  )}
+                </div>
+                <div className="relative mt-1.5">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                    minLength={6}
+                  />
+                </div>
               </div>
-            </div>
+            )}
             <Button
               type="submit"
               variant="hero"
@@ -176,21 +192,39 @@ const Auth = () => {
               className="w-full"
               disabled={loading}
             >
-              {loading ? "Laddar..." : isLogin ? "Logga in" : "Skapa konto"}
+              {loading
+                ? "Laddar..."
+                : isReset
+                ? "Skicka återställningslänk"
+                : isLogin
+                ? "Logga in"
+                : "Skapa konto"}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm">
-            <span className="text-muted-foreground">
-              {isLogin ? "Har du inget konto? " : "Har du redan ett konto? "}
-            </span>
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-primary font-medium hover:underline"
-            >
-              {isLogin ? "Skapa konto" : "Logga in"}
-            </button>
+            {isReset ? (
+              <button
+                type="button"
+                onClick={() => setMode("login")}
+                className="text-primary font-medium hover:underline"
+              >
+                Tillbaka till logga in
+              </button>
+            ) : (
+              <>
+                <span className="text-muted-foreground">
+                  {isLogin ? "Har du inget konto? " : "Har du redan ett konto? "}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMode(isLogin ? "signup" : "login")}
+                  className="text-primary font-medium hover:underline"
+                >
+                  {isLogin ? "Skapa konto" : "Logga in"}
+                </button>
+              </>
+            )}
           </div>
         </motion.div>
       </div>
