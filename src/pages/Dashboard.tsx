@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, ClipboardList, MessageSquare, Settings, TrendingUp } from "lucide-react";
+import { Plus, ClipboardList, MessageSquare, Settings, TrendingUp, CreditCard, Star, User as UserIcon, LogOut, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -77,8 +77,73 @@ const Dashboard = () => {
     );
   }
 
+  const accountLinks = [
+    { to: "/settings", icon: UserIcon, label: "Mitt konto" },
+    { to: "/my-tasks", icon: ClipboardList, label: "Mina uppdrag" },
+    { to: "/messages", icon: MessageSquare, label: "Mina förfrågningar" },
+    { to: "/settings", icon: CreditCard, label: "Betalningar" },
+    { to: "/dashboard", icon: Star, label: "Recensioner" },
+    { to: "/settings", icon: Settings, label: "Inställningar" },
+  ];
+
   return (
     <Layout>
+      {/* ===== MOBILE ACCOUNT VIEW ===== */}
+      <div className="md:hidden">
+        <div className="bg-primary text-primary-foreground px-5 pt-6 pb-8 rounded-b-3xl">
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-primary-foreground/15 flex items-center justify-center text-2xl font-semibold">
+              {(user?.email?.[0] ?? "M").toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold font-display truncate">{user?.email}</h1>
+              <p className="text-sm text-primary-foreground/80">
+                {isTasker ? "Beställare & Tasker" : "Beställare"}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-5">
+            <Button variant="accent" size="sm" asChild>
+              <Link to="/post-task"><Plus size={16} /> Skapa uppdrag</Link>
+            </Button>
+            {isTasker ? (
+              <Button variant="hero-outline" size="sm" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" asChild>
+                <Link to="/tasker-dashboard"><TrendingUp size={16} /> Tasker-vy</Link>
+              </Button>
+            ) : (
+              <Button variant="hero-outline" size="sm" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" asChild>
+                <Link to="/become-tasker">Bli tasker</Link>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="px-4 py-5">
+          <div className="rounded-2xl bg-card border border-border divide-y divide-border overflow-hidden">
+            {accountLinks.map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                className="flex items-center gap-3 px-4 py-4 hover:bg-secondary/50 transition-colors min-h-[56px]"
+              >
+                <item.icon size={20} className="text-muted-foreground" />
+                <span className="flex-1 font-medium text-foreground">{item.label}</span>
+                <ChevronRight size={18} className="text-muted-foreground" />
+              </Link>
+            ))}
+            <button
+              onClick={signOut}
+              className="w-full flex items-center gap-3 px-4 py-4 hover:bg-secondary/50 transition-colors min-h-[56px] text-destructive"
+            >
+              <LogOut size={20} />
+              <span className="flex-1 text-left font-medium">Logga ut</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== DESKTOP DASHBOARD ===== */}
+      <div className="hidden md:block">
       <div className="bg-secondary/50 border-b border-border">
         <div className="container py-8">
           <div className="flex items-center justify-between">
@@ -194,6 +259,7 @@ const Dashboard = () => {
             </div>
           </motion.div>
         </div>
+      </div>
       </div>
     </Layout>
   );

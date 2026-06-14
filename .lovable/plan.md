@@ -1,85 +1,103 @@
-## Vad som är fel idag
+# Moas Mobile-First Redesign
 
-1. **`permission denied for table profiles`** — `public.profiles` har inga GRANTs alls för rollen `authenticated` (varken SELECT eller UPDATE). RLS-policyerna är korrekta, men utan tabell-grants når PostgREST inte tabellen och alla `.update("profiles")`/`.select("profiles")` från klienten faller. Det är därför onboarding-submit, settings, dashboard m.fl. inte fungerar.
+Restructure Moas into an app-like, mobile-first experience while preserving desktop and all existing flows (auth, tasks, profiles, messaging, admin, i18n, payments).
 
-2. **Onboarding tvingar val av roll** (`bestallare | tasker | foretag`). Du vill istället att alla användare ska kunna vara både beställare och utförare — och att `företag` tas bort helt. Personnummer/BankID skjuts upp tills BankID-API:t kopplas in.
+## Scope & Principles
+- Mobile = primary. Desktop = preserved top nav (unchanged behavior).
+- No breaking changes to routes, data, RLS, edge functions, or business logic.
+- All work in frontend/presentation layer.
+- Swedish default, language toggle preserved.
 
-## Plan
+## 1. App Shell (`src/components/Layout.tsx`)
+- Wrap content with `pb-20 md:pb-0` to clear bottom nav.
+- Add `env(safe-area-inset-*)` padding via Tailwind utilities (extend in `index.css`).
+- Render new `<MobileBottomNav />` (hidden `md:hidden`).
+- Hide existing `<Footer />` on mobile (`hidden md:block`) — minimal footer on mobile = none, since bottom nav replaces it.
+- Header: keep existing desktop top nav; on mobile, simplify to logo + language toggle + account icon (remove hamburger duplicating bottom nav).
 
-### 1. Migration — fixa GRANTs och rensa rolldata
+## 2. New: `src/components/MobileBottomNav.tsx`
+Fixed bottom nav, 5 tabs with icons + Swedish labels:
+- Hem → `/`
+- Uppdrag → `/browse`
+- Skapa → `/post-task` (center, elevated primary circle/FAB style — accent color, larger, lifted)
+- Meddelanden → `/messages`
+- Profil → `/dashboard`
 
-- `GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated`
-- `GRANT ALL ON public.profiles TO service_role`
-- (Ingen anon-grant — RLS-policyerna är `auth.uid()`-baserade.)
-- Lägg till nya kolumner:
-  - `first_name text`
-  - `last_name text`
-  - (Behåll befintliga `name`, `phone`, `city`, `onboarding_completed`.)
-- Gör `role`-kolumnen valfri och inaktuell:
-  - `ALTER COLUMN role DROP NOT NULL` (om satt)
-  - Vi slutar skriva till den från klienten. Lämnar enum och kolumn kvar för bakåtkompatibilitet — markeras som deprecated i kod. Inga nya värden skrivs.
-- Trigger `handle_new_user` uppdateras så att `first_name`/`last_name` plockas från Google-metadata när det finns (`given_name`, `family_name`).
-- INGEN personnummer-kolumn skapas nu.
+Active state via `useLocation`. Safe-area aware. Hidden on `/auth`, `/onboarding`, `/checkout/*` via prop or route check.
 
-### 2. Onboarding-formuläret
+## 3. Mobile Homepage (`src/pages/Index.tsx`)
+Add mobile-only block above existing sections (`md:hidden`), keep desktop hero (`hidden md:block`):
+- Greeting ("Hej 👋" / "Välkommen till Moas")
+- Tagline: "Få saker gjorda nära dig"
+- Large search input → routes to `/browse?q=`
+- "Använd min plats" button (uses existing city selector logic; no geolocation API needed yet, just opens city dropdown)
+- Popular services (reuse `CategoryGrid`, compact variant)
+- Live tasks near you (reuse `LiveTaskFeed`)
+- Trust message strip
 
-Ersätt nuvarande tre-vals roll-väljare med:
+Desktop hero/sections untouched.
 
-- Förnamn (obligatoriskt)
-- Efternamn (obligatoriskt)
-- Telefonnummer (obligatoriskt, samma validering som idag)
-- Stad (obligatoriskt, samma dropdown)
-- Godkänn villkor (obligatoriskt)
+## 4. Task Browsing (`src/pages/BrowseTasks.tsx` + `TaskCard`)
+- Add compact mobile card variant in `TaskCard` (prop `compact` or auto via `useIsMobile`): tighter padding, single-line title, price prominent right, meta row (city · category · time), small status chip.
+- Filter bar: collapsible on mobile (sheet/drawer trigger).
 
-Vid submit:
-- Skriv `first_name`, `last_name`, `name = first_name + " " + last_name`, `phone`, `city`, `google_connected = true`, `onboarding_completed = true`.
-- Skriv INTE `role`.
-- Vid fel — visa toast och logga som idag.
+## 5. Guided Post Task Flow (`src/pages/PostTask.tsx`)
+Convert to 6-step wizard with progress indicator:
+1. Vad behöver du hjälp med? (title + description)
+2. Välj kategori
+3. Var? (city)
+4. När? (date)
+5. Budget (SEK)
+6. Granska och publicera
 
-Hjälptext under formuläret: "Du kan både lägga upp uppdrag och utföra uppdrag — du behöver inte välja nu. BankID-verifiering krävs senare för att utföra uppdrag."
+State held locally; submit calls same existing insert. Each step = full-screen on mobile, single-column on desktop. Back/Next buttons, progress dots at top.
 
-### 3. App-beteende kring "roll"
+## 6. Profile (`src/pages/PublicProfile.tsx`)
+Mobile layout tweaks: avatar + name centered, rating row, badges grid, sticky bottom CTA bar on mobile with "Skicka förfrågan" / "Skapa liknande uppdrag".
 
-- `useAuth.isTasker` baseras redan på `tasker_profiles` (separat tabell) — inget byte behövs.
-- "Beställare" är default — alla inloggade kan posta uppdrag.
-- För att börja utföra uppdrag fortsätter `/become-tasker`-flödet som idag (skapar tasker_profile). Senare gate:as den bakom BankID — förbereds inte i denna migration.
-- Tar bort referenser till `profile.role` i UI där det fortfarande används (inget kritiskt — främst Onboarding och eventuell visning).
+## 7. Messages (`src/pages/Messages.tsx`)
+Mobile: full-screen thread view (hide list when thread open), sticky composer with safe-area, sticky task context header. Desktop: keep split view.
 
-### 4. Stadig grund för BankID senare (förberedelse, ingen kod nu)
+## 8. Account Tab (`src/pages/Dashboard.tsx`)
+Mobile list view with items: Mitt konto, Mina uppdrag, Mina förfrågningar, Betalningar, Recensioner, Inställningar, Logga ut. Desktop layout untouched.
 
-- `bankid_verified` och `id_verified` finns redan på `profiles` (boolean, default false).
-- När BankID-API:t läggs till sker det i ett separat steg: edge function + UI-knapp + uppdaterar `bankid_verified` + lagrar verifierat personnummer.
+## 9. PWA Manifest (manifest-only, no service worker)
+- Create `public/manifest.webmanifest`: name "Moas", short_name "Moas", theme_color teal `#1f8a82`, background `#faf9f6`, display `standalone`, start_url `/`.
+- Generate Moas "M" icon (192, 512) via imagegen → `public/icon-192.png`, `public/icon-512.png`, `public/apple-touch-icon.png`.
+- Update `index.html`: manifest link, theme-color meta, apple-touch-icon, apple-mobile-web-app-capable.
 
-## Filer som ändras
+## 10. Safe-area & Tap Targets
+Extend `src/index.css`:
+- `.pt-safe`, `.pb-safe`, `.pb-safe-nav` utilities using `env(safe-area-inset-*)`.
+- Min 44px tap targets on bottom nav buttons.
+- Prevent horizontal overflow: `body { overflow-x: hidden }`.
 
-- **Ny migration** — grants på `profiles`, nya kolumner `first_name`/`last_name`, uppdaterad `handle_new_user`-trigger, gör `role` nullable.
-- **`src/pages/Onboarding.tsx`** — nytt formulär utan rollval, nya fält, ny submit-payload.
-- **`src/hooks/useAuth.tsx`** — oförändrad logik, men skickar inte längre `role` någonstans (om något ställe gör det).
-- **`src/integrations/supabase/types.ts`** — autogenereras efter migration.
-- (Inga ändringar på BrowseTasks, PostTask, TaskCard, kategorier, betalningar, admin, meddelanden, recensioner, trust-badges eller språkväxling.)
+## 11. Branding Audit
+Grep for "Taskly" → replace remaining with "Moas". Header already shows "Moas".
 
-## Tekniska detaljer
+## 12. Files Changed
+**New:**
+- `src/components/MobileBottomNav.tsx`
+- `public/manifest.webmanifest`
+- `public/icon-192.png`, `public/icon-512.png`, `public/apple-touch-icon.png`
 
-```sql
--- Data-API grants
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
-GRANT ALL ON public.profiles TO service_role;
+**Edited:**
+- `src/components/Layout.tsx` (mobile padding, bottom nav, hide footer mobile)
+- `src/components/Header.tsx` (simplify mobile)
+- `src/pages/Index.tsx` (mobile home block)
+- `src/pages/BrowseTasks.tsx` + `src/components/TaskCard.tsx` (compact mobile)
+- `src/pages/PostTask.tsx` (wizard)
+- `src/pages/Messages.tsx` (mobile full-screen chat)
+- `src/pages/Dashboard.tsx` (mobile account list)
+- `src/pages/PublicProfile.tsx` (sticky mobile CTA)
+- `src/index.css` (safe-area utilities, overflow-x)
+- `index.html` (PWA tags)
+- Any stray "Taskly" strings
 
--- Nya kolumner
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS first_name text,
-  ADD COLUMN IF NOT EXISTS last_name  text;
+**Not touched:**
+- Auth, RLS, migrations, edge functions, types, payment logic, i18n keys (only additions), admin, reviews, escrow, BankID stubs.
 
--- Roll blir valfri
-ALTER TABLE public.profiles ALTER COLUMN role DROP NOT NULL;
-
--- Trigger uppdatering: ta in given_name / family_name från Google
--- (CREATE OR REPLACE FUNCTION handle_new_user ...)
-```
-
-## Vad som inte ändras
-
-- Befintliga RLS-policyer på `profiles` (ägare + admin) — redan korrekta.
-- `public_profiles`-vyn (offentlig läsning av säkra fält).
-- Säkerhetsfixar från förra migrationen (address_optional, helper-funktioner, GraphQL-revokes).
-- Layout, design, kategorier, kategorisidor, övrig navigation.
+## Out of scope (explicit)
+- Service worker / offline (manifest-only per request).
+- Geolocation API (just city selector for now).
+- Real BankID, real Swish API.

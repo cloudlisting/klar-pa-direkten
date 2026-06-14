@@ -1,28 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="sv">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>moas</title>
-    <meta name="description" content="Moas is a Swedish marketplace where you can post tasks and get help from verified people and companies nearby.">
-    <meta name="author" content="Lovable" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Moas – Få saker gjorda nära dig</title>
+    <meta name="description" content="Moas är en svensk marknadsplats där du kan lägga upp uppdrag och få hjälp av verifierade personer i ditt område.">
+    <meta name="author" content="Moas" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    
-    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#1f8a82" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Moas" />
+    <link rel="apple-touch-icon" href="/icon-512.png" />
+    <link rel="icon" type="image/png" href="/icon-512.png" />
+
     <meta property="og:type" content="website" />
+    <meta property="og:title" content="Moas – Få saker gjorda nära dig">
+    <meta property="og:description" content="Svensk marknadsplats för lokala uppdrag, ärenden, hemtjänster och vardagsjobb.">
     <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/670e4b65-1334-4324-a33e-7cb70f4d10c9/id-preview-1a01ac35--39d90df4-88eb-4eda-ab47-15a9822430bc.lovable.app-1781210641944.png">
-
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/670e4b65-1334-4324-a33e-7cb70f4d10c9/id-preview-1a01ac35--39d90df4-88eb-4eda-ab47-15a9822430bc.lovable.app-1781210641944.png">
-    <meta property="og:title" content="moas">
-  <meta name="twitter:title" content="moas">
-  <meta property="og:description" content="Moas is a Swedish marketplace where you can post tasks and get help from verified people and companies nearby.">
-  <meta name="twitter:description" content="Moas is a Swedish marketplace where you can post tasks and get help from verified people and companies nearby.">
-</head>
-
+    <meta name="twitter:title" content="Moas – Få saker gjorda nära dig">
+    <meta name="twitter:description" content="Svensk marknadsplats för lokala uppdrag, ärenden, hemtjänster och vardagsjobb.">
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

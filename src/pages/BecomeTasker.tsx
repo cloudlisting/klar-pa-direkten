@@ -103,7 +103,7 @@ const BecomeTasker = () => {
       <Layout>
         <div className="container max-w-lg py-16 text-center">
           <h1 className="text-2xl font-bold font-display text-foreground mb-4">
-            Bli tasker på Taskly
+            Bli tasker på Moas
           </h1>
           <p className="text-muted-foreground mb-6">
             Du måste logga in eller skapa ett konto för att bli tasker.
