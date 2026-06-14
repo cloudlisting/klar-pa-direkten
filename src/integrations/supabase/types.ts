@@ -455,6 +455,7 @@ export type Database = {
       tasks: {
         Row: {
           address_optional: string | null
+          address_text: string | null
           assigned_tasker_id: string | null
           auto_accept_price_sek: number | null
           budget_max_sek: number | null
@@ -468,14 +469,19 @@ export type Database = {
           id: string
           is_hidden: boolean
           is_remote_possible: boolean | null
+          latitude: number | null
+          location_confirmed: boolean
+          longitude: number | null
           preferred_date: string | null
           preferred_time: string | null
           status: Database["public"]["Enums"]["task_status"]
+          timing_type: string
           title: string
           updated_at: string
         }
         Insert: {
           address_optional?: string | null
+          address_text?: string | null
           assigned_tasker_id?: string | null
           auto_accept_price_sek?: number | null
           budget_max_sek?: number | null
@@ -489,14 +495,19 @@ export type Database = {
           id?: string
           is_hidden?: boolean
           is_remote_possible?: boolean | null
+          latitude?: number | null
+          location_confirmed?: boolean
+          longitude?: number | null
           preferred_date?: string | null
           preferred_time?: string | null
           status?: Database["public"]["Enums"]["task_status"]
+          timing_type?: string
           title: string
           updated_at?: string
         }
         Update: {
           address_optional?: string | null
+          address_text?: string | null
           assigned_tasker_id?: string | null
           auto_accept_price_sek?: number | null
           budget_max_sek?: number | null
@@ -510,9 +521,13 @@ export type Database = {
           id?: string
           is_hidden?: boolean
           is_remote_possible?: boolean | null
+          latitude?: number | null
+          location_confirmed?: boolean
+          longitude?: number | null
           preferred_date?: string | null
           preferred_time?: string | null
           status?: Database["public"]["Enums"]["task_status"]
+          timing_type?: string
           title?: string
           updated_at?: string
         }
