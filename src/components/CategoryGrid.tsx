@@ -1,5 +1,7 @@
 import { CATEGORIES } from "@/lib/constants";
 import { Link } from "react-router-dom";
+import { Trash2, ShoppingBag, Truck, Drill, Sparkles, Leaf } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 const CATEGORY_ICONS: Record<string, string> = {
   waste: "🗑️",
@@ -14,14 +16,20 @@ const CATEGORY_ICONS: Record<string, string> = {
   other: "✨",
 };
 
-// Simplified category names for the mobile horizontal strip
-const MOBILE_CATEGORIES = [
-  { id: "waste", name: "Avfall & återvinning" },
-  { id: "errands", name: "Inköp & ärenden" },
-  { id: "moving", name: "Hämta & lämna" },
-  { id: "assembly", name: "Montering & hemfix" },
-  { id: "cleaning", name: "Städning" },
-  { id: "gardening", name: "Trädgård" },
+// Mobile compact category cards — exactly 6, colored lucide icons
+const MOBILE_CATEGORIES: {
+  id: string;
+  name: string;
+  Icon: LucideIcon;
+  color: string;
+  bg: string;
+}[] = [
+  { id: "waste", name: "Avfall & återvinning", Icon: Trash2, color: "text-primary", bg: "bg-primary/10" },
+  { id: "errands", name: "Inköp & ärenden", Icon: ShoppingBag, color: "text-accent", bg: "bg-accent/10" },
+  { id: "moving", name: "Hämta & lämna", Icon: Truck, color: "text-primary", bg: "bg-primary/10" },
+  { id: "assembly", name: "Montering & hemfix", Icon: Drill, color: "text-accent", bg: "bg-accent/10" },
+  { id: "cleaning", name: "Städning", Icon: Sparkles, color: "text-muted-foreground", bg: "bg-secondary" },
+  { id: "gardening", name: "Trädgård", Icon: Leaf, color: "text-primary", bg: "bg-primary/10" },
 ];
 
 const CategoryGrid = () => {
