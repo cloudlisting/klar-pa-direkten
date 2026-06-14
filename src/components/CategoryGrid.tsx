@@ -56,20 +56,20 @@ const CategoryGrid = () => {
         ))}
       </div>
 
-      {/* Mobile: horizontal scroll */}
+      {/* Mobile: horizontal scroll, 6 compact cards */}
       <div className="md:hidden -mx-5 px-5">
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
-          {MOBILE_CATEGORIES.map((cat) => (
+        <div className="flex gap-2.5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
+          {MOBILE_CATEGORIES.map(({ id, name, Icon, color, bg }) => (
             <Link
-              key={cat.id}
-              to={`/browse?category=${cat.id}`}
-              className="flex flex-col items-center gap-2 min-w-[88px] snap-start"
+              key={id}
+              to={`/browse?category=${id}`}
+              className="flex flex-col items-center justify-start gap-2 min-w-[96px] snap-start rounded-2xl border border-border bg-card p-3 shadow-sm active:scale-[0.97] transition-transform"
             >
-              <div className="flex h-[72px] w-[72px] items-center justify-center rounded-2xl border border-border bg-card text-3xl shadow-sm">
-                {CATEGORY_ICONS[cat.id]}
+              <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${bg}`}>
+                <Icon size={22} className={color} strokeWidth={2} />
               </div>
-              <span className="text-[11px] font-medium text-foreground text-center leading-tight max-w-[88px]">
-                {cat.name}
+              <span className="text-[11px] font-medium text-foreground text-center leading-tight">
+                {name}
               </span>
             </Link>
           ))}
