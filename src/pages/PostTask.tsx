@@ -112,10 +112,10 @@ const PostTask = () => {
     parseInt(price) >= 1 &&
     (timingType === "asap" || (date && time));
 
-  const uploadPhotos = async (taskId: string) => {
-    if (!photos.length || !user) return;
+  const uploadPhotos = async (taskId: string, uid: string) => {
+    if (!photos.length) return;
     for (const file of photos) {
-      const path = `${user.id}/${taskId}/${Date.now()}-${file.name}`;
+      const path = `${uid}/${taskId}/${Date.now()}-${file.name}`;
       const { error } = await supabase.storage
         .from("task-photos")
         .upload(path, file, { upsert: false });
@@ -126,14 +126,27 @@ const PostTask = () => {
   };
 
   const handleSubmit = async () => {
-    if (!user || !canSubmit) return;
+    if (!canSubmit) return;
     setSubmitting(true);
     try {
+      // Ensure fresh session so auth.uid() works server-side for RLS
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        const { data: refreshed } = await supabase.auth.refreshSession();
+        session = refreshed.session;
+      }
+      if (!session?.user) {
+        toast.error("Din session har gått ut. Logga in igen.");
+        navigate("/auth");
+        return;
+      }
+      const uid = session.user.id;
+
       const priceNum = parseInt(price);
       const { data, error } = await supabase
         .from("tasks")
         .insert({
-          customer_user_id: user.id,
+          customer_user_id: uid,
           title: title.trim(),
           category: DEFAULT_CATEGORY,
           description: description.trim(),
@@ -156,7 +169,7 @@ const PostTask = () => {
         .single();
       if (error) throw error;
 
-      await uploadPhotos(data.id);
+      await uploadPhotos(data.id, uid);
       setCreatedTaskId(data.id);
       toast.success("Uppdraget är publicerat!");
     } catch (e: any) {
