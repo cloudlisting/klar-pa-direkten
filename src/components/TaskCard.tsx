@@ -34,12 +34,6 @@ const TaskCard = ({ task }: TaskCardProps) => {
             <Badge variant="secondary" className="text-xs">
               {task.category}
             </Badge>
-            {task.status === "instant" && (
-              <Badge variant="accent" className="text-xs gap-1">
-                <Zap size={10} />
-                Direkt
-              </Badge>
-            )}
             <Badge variant={task.status === "open" || task.status === "instant" ? "success" : "muted"} className="text-xs">
               {task.status === "open" || task.status === "instant" ? "Öppen" : task.status}
             </Badge>

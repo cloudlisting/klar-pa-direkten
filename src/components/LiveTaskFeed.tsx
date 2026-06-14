@@ -149,11 +149,7 @@ const LiveTaskFeed = () => {
                         <Badge variant="secondary" className="text-[10px]">
                           {task.category}
                         </Badge>
-                        {isInstant && (
-                          <Badge variant="accent" className="text-[10px] gap-1">
-                            <Zap size={10} /> {t("common.instant")}
-                          </Badge>
-                        )}
+                        {/* instant badge removed for MVP */}
                         {isUrgent && (
                           <Badge variant="destructive" className="text-[10px]">
                             {t("feed.urgent")}
