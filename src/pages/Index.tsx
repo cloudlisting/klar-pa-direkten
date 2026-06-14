@@ -265,6 +265,7 @@ const Index = () => {
           </Button>
         </div>
       </section>
+      </div>
     </Layout>
   );
 };
