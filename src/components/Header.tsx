@@ -31,17 +31,17 @@ const Header = () => {
     <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-lg">
       {/* Mobile app header */}
       <div className="md:hidden">
-        <div className="container flex h-16 items-center justify-between px-4">
+        <div className="flex h-[68px] items-center justify-between px-5">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-              <span className="text-base font-bold text-primary-foreground">M</span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary">
+              <span className="text-lg font-bold text-primary-foreground font-display">M</span>
             </div>
-            <span className="text-xl font-bold font-display text-foreground">Moas</span>
+            <span className="text-[22px] font-bold font-display text-foreground tracking-tight">Moas</span>
           </Link>
 
           {/* City selector */}
-          <button className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground">
+          <button className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-2 text-[13px] font-medium text-foreground shadow-sm">
             <MapPin size={14} className="text-primary" />
             <span>Jönköping</span>
             <ChevronDown size={14} className="text-muted-foreground" />
@@ -50,12 +50,12 @@ const Header = () => {
           {/* Profile avatar */}
           <Link
             to={user ? "/dashboard" : "/auth"}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center gap-0.5 active:scale-95 transition-transform"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground border border-border">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-[12px] font-bold text-primary border border-primary/20">
               {userInitials || "M"}
             </div>
-            <span className="text-[10px] text-muted-foreground mt-0.5">Min profil</span>
+            <span className="text-[10px] text-muted-foreground leading-none">Min profil</span>
           </Link>
         </div>
       </div>
