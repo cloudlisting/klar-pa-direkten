@@ -128,15 +128,16 @@ const Index = () => {
         <div className="px-5 pt-4 pb-8">
           {/* Hero — text with overlapping image blob on right */}
           {/* Hero */}
-          <div className="relative mb-8 overflow-hidden rounded-[28px] bg-gradient-to-br from-white via-white to-primary/5 border border-border shadow-sm px-5 pt-6 pb-5 min-h-[360px]">
+          {/* Hero */}
+          <div className="relative mb-8 min-h-[365px] overflow-hidden pt-6">
             {/* Lifestyle image */}
-            <div className="absolute right-[-18px] top-[80px] w-[210px] h-[230px] pointer-events-none">
-              <div className="absolute inset-0 rounded-full bg-primary/8" />
+            <div className="absolute right-[-72px] top-[18px] w-[265px] h-[300px] pointer-events-none">
+              <div className="absolute right-0 top-8 w-[235px] h-[235px] rounded-full bg-primary/8" />
               <img src={heroImage} alt="Inredning" className="absolute inset-0 w-full h-full object-contain" />
             </div>
 
-            <div className="relative z-10 max-w-[72%]">
-              <h1 className="text-[36px] font-bold font-display text-foreground leading-[1.05] tracking-tight mb-4">
+            <div className="relative z-10 max-w-[68%]">
+              <h1 className="text-[34px] font-bold font-display text-foreground leading-[1.04] tracking-tight mb-4">
                 Vad behöver du hjälp med idag?
               </h1>
 
@@ -145,25 +146,29 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="relative z-10 mt-4 flex flex-col gap-3 max-w-[72%]">
+            <div className="relative z-10 mt-3 grid grid-cols-[1fr_1fr] gap-3">
               <button
                 onClick={() => navigate("/post-task")}
-                className="flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-accent text-accent-foreground text-[15px] font-semibold shadow-md active:scale-[0.98] transition-transform"
+                className="flex items-center justify-center gap-2 h-[54px] rounded-2xl bg-accent text-accent-foreground text-[14px] font-semibold shadow-md active:scale-[0.98] transition-transform"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/25">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/25 shrink-0">
                   <Plus size={18} strokeWidth={3} />
                 </span>
-                Skapa uppdrag
+                <span className="whitespace-nowrap">Skapa uppdrag</span>
               </button>
 
               <button
                 onClick={() => navigate("/browse")}
-                className="flex items-center justify-center gap-2 h-[52px] rounded-2xl bg-card border border-border text-[14px] font-semibold text-foreground shadow-sm active:scale-[0.98] transition-transform"
+                className="flex items-center justify-center gap-2 h-[54px] rounded-2xl bg-card border border-border text-[13px] font-semibold text-foreground shadow-sm active:scale-[0.98] transition-transform"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground shrink-0">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shrink-0">
                   <MapPin size={14} />
                 </span>
-                Se uppdrag nära dig
+                <span className="leading-tight text-left">
+                  Se uppdrag
+                  <br />
+                  nära dig
+                </span>
               </button>
             </div>
           </div>
