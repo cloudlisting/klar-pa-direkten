@@ -172,41 +172,45 @@ const Index = () => {
             </div>
           </div>
           {/* Trust cards */}
-          <div className="flex gap-3 mb-9 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-1">
-            <div className="min-w-[155px] rounded-2xl border border-border bg-card p-4 flex flex-col">
-              <div className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
-                <Shield size={20} className="text-primary-foreground" />
+          <div className="grid grid-cols-3 gap-2.5 mb-8">
+            <div className="rounded-2xl border border-border bg-card p-3 min-h-[132px] flex flex-col justify-between">
+              <div>
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+                  <Shield size={18} className="text-primary-foreground" />
+                </div>
+                <p className="text-[11.5px] font-semibold text-foreground leading-tight">Verifierade profiler</p>
+                <p className="text-[9.5px] text-muted-foreground leading-snug mt-1">Kontrollerade utförare.</p>
               </div>
-              <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">Verifierade profiler</p>
-              <p className="text-[10.5px] text-muted-foreground leading-snug mb-2.5 flex-1">
-                Endast kontrollerade utförare.
-              </p>
-              <span className="inline-flex items-center self-start text-[10px] font-bold tracking-tight text-foreground bg-secondary px-2 py-1 rounded">
+              <span className="inline-flex items-center self-start text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">
                 BankID
               </span>
             </div>
-            <div className="rounded-2xl border border-border bg-card p-3.5 flex flex-col">
-              <div className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
-                <Shield size={20} className="text-primary-foreground" />
+
+            <div className="rounded-2xl border border-border bg-card p-3 min-h-[132px] flex flex-col justify-between">
+              <div>
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+                  <Shield size={18} className="text-primary-foreground" />
+                </div>
+                <p className="text-[11.5px] font-semibold text-foreground leading-tight">Säker betalning</p>
+                <p className="text-[9.5px] text-muted-foreground leading-snug mt-1">Betala tryggt.</p>
               </div>
-              <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">Säker betalning</p>
-              <p className="text-[10.5px] text-muted-foreground leading-snug mb-2.5 flex-1">
-                Betala tryggt direkt i appen.
-              </p>
-              <div className="flex items-center gap-1 flex-wrap">
-                <span className="text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">Swish</span>
-                <span className="text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">MC</span>
-                <span className="text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">Klarna</span>
+              <div className="flex flex-wrap gap-1">
+                <span className="text-[8.5px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">Swish</span>
+                <span className="text-[8.5px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">MC</span>
+                <span className="text-[8.5px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">
+                  Klarna
+                </span>
               </div>
             </div>
-            <div className="rounded-2xl border border-border bg-card p-3.5 flex flex-col">
-              <div className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
-                <Star size={20} className="text-primary-foreground" />
+
+            <div className="rounded-2xl border border-border bg-card p-3 min-h-[132px] flex flex-col justify-between">
+              <div>
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+                  <Star size={18} className="text-primary-foreground" />
+                </div>
+                <p className="text-[11.5px] font-semibold text-foreground leading-tight">Omdömen efter varje uppdrag</p>
+                <p className="text-[9.5px] text-muted-foreground leading-snug mt-1">Riktiga betyg.</p>
               </div>
-              <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">
-                Omdömen efter varje uppdrag
-              </p>
-              <p className="text-[10.5px] text-muted-foreground leading-snug">Riktiga betyg från riktiga kunder.</p>
             </div>
           </div>
 
