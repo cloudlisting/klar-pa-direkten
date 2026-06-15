@@ -65,11 +65,12 @@ const Header = () => {
       {/* Desktop header */}
       <div className="hidden md:block">
         <div className="container flex h-16 items-center justify-between">
-          <img
-  src="/apple-touch-icon.png"
-  alt="Moas"
-  className="h-9 w-9 rounded-xl object-cover"
-/>
+          <Link to="/" className="flex items-center gap-2">
+            <img
+              src="/apple-touch-icon.png"
+              alt="Moas"
+              className="h-9 w-9 rounded-xl object-cover"
+            />
             <span className="text-xl font-bold font-display text-foreground">Moas</span>
           </Link>
 
