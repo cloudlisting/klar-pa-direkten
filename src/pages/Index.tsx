@@ -171,45 +171,25 @@ const Index = () => {
               </button>
             </div>
           </div>
-          {/* Trust cards */}
-          <div className="grid grid-cols-3 gap-2.5 mb-8">
-            <div className="rounded-2xl border border-border bg-card p-3 min-h-[132px] flex flex-col justify-between">
-              <div>
-                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
-                  <Shield size={18} className="text-primary-foreground" />
-                </div>
-                <p className="text-[11.5px] font-semibold text-foreground leading-tight">Verifierade profiler</p>
-                <p className="text-[9.5px] text-muted-foreground leading-snug mt-1">Kontrollerade utförare.</p>
+          {/* Trust strip */}
+          <div className="mb-7 rounded-2xl border border-border bg-card px-3.5 py-3 shadow-sm">
+            <div className="grid grid-cols-3 divide-x divide-border">
+              <div className="flex flex-col items-center px-2 text-center">
+                <Shield size={18} className="mb-1.5 text-primary" />
+                <p className="text-[10.5px] font-semibold text-foreground leading-tight">Verifierade</p>
+                <p className="text-[8.5px] text-muted-foreground leading-tight">BankID</p>
               </div>
-              <span className="inline-flex items-center self-start text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">
-                BankID
-              </span>
-            </div>
 
-            <div className="rounded-2xl border border-border bg-card p-3 min-h-[132px] flex flex-col justify-between">
-              <div>
-                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
-                  <Shield size={18} className="text-primary-foreground" />
-                </div>
-                <p className="text-[11.5px] font-semibold text-foreground leading-tight">Säker betalning</p>
-                <p className="text-[9.5px] text-muted-foreground leading-snug mt-1">Betala tryggt.</p>
+              <div className="flex flex-col items-center px-2 text-center">
+                <Shield size={18} className="mb-1.5 text-primary" />
+                <p className="text-[10.5px] font-semibold text-foreground leading-tight">Säker betalning</p>
+                <p className="text-[8.5px] text-muted-foreground leading-tight">Swish · Klarna</p>
               </div>
-              <div className="flex flex-wrap gap-1">
-                <span className="text-[8.5px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">Swish</span>
-                <span className="text-[8.5px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">MC</span>
-                <span className="text-[8.5px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">
-                  Klarna
-                </span>
-              </div>
-            </div>
 
-            <div className="rounded-2xl border border-border bg-card p-3 min-h-[132px] flex flex-col justify-between">
-              <div>
-                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
-                  <Star size={18} className="text-primary-foreground" />
-                </div>
-                <p className="text-[11.5px] font-semibold text-foreground leading-tight">Omdömen efter varje uppdrag</p>
-                <p className="text-[9.5px] text-muted-foreground leading-snug mt-1">Riktiga betyg.</p>
+              <div className="flex flex-col items-center px-2 text-center">
+                <Star size={18} className="mb-1.5 text-primary" />
+                <p className="text-[10.5px] font-semibold text-foreground leading-tight">Omdömen</p>
+                <p className="text-[8.5px] text-muted-foreground leading-tight">Efter jobb</p>
               </div>
             </div>
           </div>
