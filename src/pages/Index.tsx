@@ -125,7 +125,7 @@ const Index = () => {
     <Layout>
       {/* ============ MOBILE APP HOME ============ */}
       <section className="md:hidden bg-background">
-        <div className="px-5 pt-4 pb-8">
+        <div className="px-5 pt-4 pb-28">
           {/* Hero */}
           <div className="mb-8 pt-5">
             <div className="grid grid-cols-[1.05fr_0.95fr] gap-3 items-center mb-5">
