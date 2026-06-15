@@ -158,7 +158,7 @@ const Index = () => {
 
               <button
                 onClick={() => navigate("/browse")}
-                className="flex items-center justify-center gap-2 h-13 rounded-2xl bg-card border border-border text-[14px] font-semibold text-foreground shadow-sm active:scale-[0.98] transition-transform"
+                className="flex items-center justify-center gap-2 h-[52px] rounded-2xl bg-card border border-border text-[14px] font-semibold text-foreground shadow-sm active:scale-[0.98] transition-transform"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground shrink-0">
                   <MapPin size={14} />
