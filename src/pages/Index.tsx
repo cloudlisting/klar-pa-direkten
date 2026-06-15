@@ -127,10 +127,10 @@ const Index = () => {
       <section className="md:hidden bg-background">
         <div className="px-5 pt-4 pb-28">
           {/* Hero */}
-          <div className="mb-8 pt-5">
+          <div className="mb-6 pt-4">
             <div className="grid grid-cols-[1.05fr_0.95fr] gap-3 items-center mb-5">
               <div>
-                <h1 className="text-[31px] font-bold font-display text-foreground leading-[1.05] tracking-tight mb-4">
+                <h1 className="text-[29px] font-bold font-display text-foreground leading-[1.05] tracking-tight mb-4">
                   Vad behöver du hjälp med idag?
                 </h1>
 
@@ -139,7 +139,7 @@ const Index = () => {
                 </p>
               </div>
 
-              <div className="relative h-[210px] overflow-hidden rounded-[28px] bg-primary/5">
+              <div className="relative h-[190px] overflow-hidden rounded-[28px] bg-primary/5">
                 <div className="absolute inset-0 rounded-full bg-primary/8 scale-90" />
                 <img src={heroImage} alt="Inredning" className="absolute inset-0 w-full h-full object-cover" />
               </div>
@@ -148,7 +148,7 @@ const Index = () => {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => navigate("/post-task")}
-                className="flex items-center justify-center gap-2 h-[54px] rounded-2xl bg-accent text-accent-foreground text-[14px] font-semibold shadow-md active:scale-[0.98] transition-transform"
+                className="flex items-center justify-center gap-2 h-[50px] rounded-2xl bg-accent text-accent-foreground text-[14px] font-semibold shadow-md active:scale-[0.98] transition-transform"
               >
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/25 shrink-0">
                   <Plus size={18} strokeWidth={3} />
