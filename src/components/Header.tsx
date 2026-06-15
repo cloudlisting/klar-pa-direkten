@@ -33,12 +33,12 @@ const Header = () => {
       <div className="md:hidden">
         <div className="flex h-[68px] items-center justify-between px-5">
           {/* Logo */}
-       <img
-  src="/apple-touch-icon.png"
-  alt="Moas"
-  className="h-10 w-10 rounded-2xl object-cover"
-/>
-            </div>
+          <Link to="/" className="flex items-center gap-2">
+            <img
+              src="/apple-touch-icon.png"
+              alt="Moas"
+              className="h-10 w-10 rounded-2xl object-cover"
+            />
             <span className="text-[22px] font-bold font-display text-foreground tracking-tight">Moas</span>
           </Link>
 
