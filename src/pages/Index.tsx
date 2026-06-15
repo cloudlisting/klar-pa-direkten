@@ -195,8 +195,8 @@ const Index = () => {
           </div>
 
           {/* Popular services */}
-          <div className="mb-9">
-            <div className="flex items-center justify-between mb-4">
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
               <h2 className="text-[20px] font-bold font-display text-foreground">Populära tjänster</h2>
               <Link to="/browse" className="text-[13px] text-primary font-semibold flex items-center gap-1">
                 Visa alla <ArrowRight size={14} />
