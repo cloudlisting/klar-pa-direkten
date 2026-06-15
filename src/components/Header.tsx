@@ -33,9 +33,11 @@ const Header = () => {
       <div className="md:hidden">
         <div className="flex h-[68px] items-center justify-between px-5">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary">
-              <span className="text-lg font-bold text-primary-foreground font-display">M</span>
+       <img
+  src="/apple-touch-icon.png"
+  alt="Moas"
+  className="h-10 w-10 rounded-2xl object-cover"
+/>
             </div>
             <span className="text-[22px] font-bold font-display text-foreground tracking-tight">Moas</span>
           </Link>
@@ -63,10 +65,11 @@ const Header = () => {
       {/* Desktop header */}
       <div className="hidden md:block">
         <div className="container flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-              <span className="text-lg font-bold text-primary-foreground">M</span>
-            </div>
+          <img
+  src="/apple-touch-icon.png"
+  alt="Moas"
+  className="h-9 w-9 rounded-xl object-cover"
+/>
             <span className="text-xl font-bold font-display text-foreground">Moas</span>
           </Link>
 
