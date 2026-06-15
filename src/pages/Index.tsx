@@ -126,27 +126,26 @@ const Index = () => {
       {/* ============ MOBILE APP HOME ============ */}
       <section className="md:hidden bg-background">
         <div className="px-5 pt-4 pb-8">
-          {/* Hero — text with overlapping image blob on right */}
           {/* Hero */}
-          {/* Hero */}
-          <div className="relative mb-8 min-h-[365px] overflow-hidden pt-6">
-            {/* Lifestyle image */}
-            <div className="absolute right-[-72px] top-[18px] w-[265px] h-[300px] pointer-events-none">
-              <div className="absolute right-0 top-8 w-[235px] h-[235px] rounded-full bg-primary/8" />
-              <img src={heroImage} alt="Inredning" className="absolute inset-0 w-full h-full object-contain" />
+          <div className="mb-8 pt-5">
+            <div className="grid grid-cols-[1.05fr_0.95fr] gap-3 items-center mb-5">
+              <div>
+                <h1 className="text-[31px] font-bold font-display text-foreground leading-[1.05] tracking-tight mb-4">
+                  Vad behöver du hjälp med idag?
+                </h1>
+
+                <p className="text-[14.5px] text-muted-foreground leading-relaxed">
+                  Skapa ett uppdrag på mindre än en minut och få svar från lokala utförare.
+                </p>
+              </div>
+
+              <div className="relative h-[210px] overflow-hidden rounded-[28px] bg-primary/5">
+                <div className="absolute inset-0 rounded-full bg-primary/8 scale-90" />
+                <img src={heroImage} alt="Inredning" className="absolute inset-0 w-full h-full object-cover" />
+              </div>
             </div>
 
-            <div className="relative z-10 max-w-[68%]">
-              <h1 className="text-[34px] font-bold font-display text-foreground leading-[1.04] tracking-tight mb-4">
-                Vad behöver du hjälp med idag?
-              </h1>
-
-              <p className="text-[15px] text-muted-foreground leading-relaxed mb-6">
-                Skapa ett uppdrag på mindre än en minut och få svar från lokala utförare.
-              </p>
-            </div>
-
-            <div className="relative z-10 mt-3 grid grid-cols-[1fr_1fr] gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => navigate("/post-task")}
                 className="flex items-center justify-center gap-2 h-[54px] rounded-2xl bg-accent text-accent-foreground text-[14px] font-semibold shadow-md active:scale-[0.98] transition-transform"
@@ -172,10 +171,9 @@ const Index = () => {
               </button>
             </div>
           </div>
-
           {/* Trust cards */}
-          <div className="grid grid-cols-3 gap-2.5 mb-9">
-            <div className="rounded-2xl border border-border bg-card p-3.5 flex flex-col">
+          <div className="flex gap-3 mb-9 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-1">
+            <div className="min-w-[155px] rounded-2xl border border-border bg-card p-4 flex flex-col">
               <div className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
                 <Shield size={20} className="text-primary-foreground" />
               </div>
