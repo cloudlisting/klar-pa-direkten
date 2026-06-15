@@ -122,13 +122,13 @@ const Index = () => {
   return (
     <Layout>
       {/* ============ MOBILE APP HOME ============ */}
-      <section className="md:hidden">
-        <div className="px-5 pt-3 pb-6">
+      <section className="md:hidden bg-background">
+        <div className="px-5 pt-4 pb-8">
           {/* Hero — text with overlapping image blob on right */}
-          <div className="relative mb-6">
+          <div className="relative mb-7 min-h-[280px]">
             {/* Image blob */}
-            <div className="absolute -top-2 -right-4 w-[180px] h-[200px] pointer-events-none">
-              <div className="absolute inset-0 bg-primary/10 rounded-[50%_45%_55%_50%/55%_50%_50%_45%]" />
+            <div className="absolute -top-2 -right-6 w-[240px] h-[280px] pointer-events-none">
+              <div className="absolute inset-0 bg-primary/10 rounded-[55%_45%_50%_50%/60%_55%_45%_40%]" />
               <img
                 src={heroImage}
                 alt="Inredning"
@@ -136,77 +136,76 @@ const Index = () => {
               />
             </div>
 
-            <div className="relative z-10 max-w-[62%]">
-              <h1 className="text-[30px] font-bold font-display text-foreground leading-[1.1] mb-3">
+            <div className="relative z-10 max-w-[58%] pt-2">
+              <h1 className="text-[34px] font-bold font-display text-foreground leading-[1.05] tracking-tight mb-4">
                 Vad behöver du hjälp med idag?
               </h1>
-              <p className="text-[13px] text-muted-foreground leading-relaxed">
+              <p className="text-[14px] text-muted-foreground leading-relaxed">
                 Skapa ett uppdrag på mindre än en minut och få svar från lokala utförare.
               </p>
             </div>
-          </div>
 
-          {/* CTA buttons — primary wide + secondary pill */}
-          <div className="flex items-center gap-2 mb-7">
-            <Button
-              size="lg"
-              className="flex-1 h-12 gap-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-2xl text-[15px] font-semibold shadow-sm"
-              onClick={() => navigate("/post-task")}
-            >
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/25">
-                <Plus size={16} strokeWidth={3} />
-              </span>
-              Skapa uppdrag
-            </Button>
-            <button
-              onClick={() => navigate("/browse")}
-              className="flex items-center gap-2 h-12 px-4 rounded-2xl bg-card border border-border text-[13px] font-medium text-foreground shadow-sm active:scale-[0.97] transition-transform"
-            >
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background">
-                <MapPin size={14} />
-              </span>
-              Se uppdrag nära dig
-            </button>
+            {/* CTA buttons — overlap into image area, larger */}
+            <div className="relative z-10 flex items-center gap-2.5 mt-6">
+              <button
+                onClick={() => navigate("/post-task")}
+                className="flex items-center gap-2.5 h-14 px-5 rounded-2xl bg-accent text-accent-foreground text-[15px] font-semibold shadow-md active:scale-[0.97] transition-transform"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/25">
+                  <Plus size={18} strokeWidth={3} />
+                </span>
+                Skapa uppdrag
+              </button>
+              <button
+                onClick={() => navigate("/browse")}
+                className="flex items-center gap-2 h-14 px-3.5 rounded-2xl bg-card border border-border text-[12px] font-semibold text-foreground shadow-sm active:scale-[0.97] transition-transform"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background shrink-0">
+                  <MapPin size={15} />
+                </span>
+                <span className="leading-tight text-left">Se uppdrag<br/>nära dig</span>
+              </button>
+            </div>
           </div>
 
           {/* Trust cards */}
-          <div className="grid grid-cols-3 gap-2 mb-8">
-            <div className="rounded-2xl border border-border bg-card p-3">
-              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
-                <Shield size={18} className="text-primary-foreground" />
+          <div className="grid grid-cols-3 gap-2.5 mb-9">
+            <div className="rounded-2xl border border-border bg-card p-3.5 flex flex-col">
+              <div className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
+                <Shield size={20} className="text-primary-foreground" />
               </div>
-              <p className="text-[11px] font-semibold text-foreground leading-tight">Verifierade profiler</p>
-              <p className="text-[10px] text-muted-foreground mt-1 leading-tight mb-2">Endast kontrollerade utförare.</p>
-              <span className="inline-block text-[9px] font-bold tracking-tight text-foreground bg-secondary px-1.5 py-0.5 rounded">
+              <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">Verifierade profiler</p>
+              <p className="text-[10.5px] text-muted-foreground leading-snug mb-2.5 flex-1">Endast kontrollerade utförare.</p>
+              <span className="inline-flex items-center self-start text-[10px] font-bold tracking-tight text-foreground bg-secondary px-2 py-1 rounded">
                 BankID
               </span>
             </div>
-            <div className="rounded-2xl border border-border bg-card p-3">
-              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
-                <Shield size={18} className="text-primary-foreground" />
+            <div className="rounded-2xl border border-border bg-card p-3.5 flex flex-col">
+              <div className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
+                <Shield size={20} className="text-primary-foreground" />
               </div>
-              <p className="text-[11px] font-semibold text-foreground leading-tight">Säker betalning</p>
-              <p className="text-[10px] text-muted-foreground mt-1 leading-tight mb-2">Betala tryggt direkt i appen.</p>
-              <div className="flex items-center gap-1 text-[8px] font-semibold text-muted-foreground">
-                <span className="bg-secondary px-1 py-0.5 rounded">Swish</span>
-                <span className="bg-secondary px-1 py-0.5 rounded">MC</span>
-                <span className="bg-secondary px-1 py-0.5 rounded">Klarna</span>
+              <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">Säker betalning</p>
+              <p className="text-[10.5px] text-muted-foreground leading-snug mb-2.5 flex-1">Betala tryggt direkt i appen.</p>
+              <div className="flex items-center gap-1 flex-wrap">
+                <span className="text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">Swish</span>
+                <span className="text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">MC</span>
+                <span className="text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">Klarna</span>
               </div>
             </div>
-            <div className="rounded-2xl border border-border bg-card p-3">
-              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary">
-                <Star size={18} className="text-primary-foreground" />
+            <div className="rounded-2xl border border-border bg-card p-3.5 flex flex-col">
+              <div className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
+                <Star size={20} className="text-primary-foreground" />
               </div>
-              <p className="text-[11px] font-semibold text-foreground leading-tight">Omdömen efter varje uppdrag</p>
-              <p className="text-[10px] text-muted-foreground mt-1 leading-tight">Riktiga betyg från riktiga kunder.</p>
+              <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">Omdömen efter varje uppdrag</p>
+              <p className="text-[10.5px] text-muted-foreground leading-snug">Riktiga betyg från riktiga kunder.</p>
             </div>
           </div>
 
           {/* Popular services */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold font-display">Populära tjänster</h2>
-              <Link to="/browse" className="text-sm text-primary font-medium flex items-center gap-1">
+          <div className="mb-9">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[20px] font-bold font-display text-foreground">Populära tjänster</h2>
+              <Link to="/browse" className="text-[13px] text-primary font-semibold flex items-center gap-1">
                 Visa alla <ArrowRight size={14} />
               </Link>
             </div>
@@ -215,28 +214,28 @@ const Index = () => {
 
           {/* Nearby tasks - horizontal cards */}
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold font-display">Uppdrag nära dig</h2>
-              <Link to="/browse" className="text-sm text-primary font-medium flex items-center gap-1">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[20px] font-bold font-display text-foreground">Uppdrag nära dig</h2>
+              <Link to="/browse" className="text-[13px] text-primary font-semibold flex items-center gap-1">
                 Visa alla <ArrowRight size={14} />
               </Link>
             </div>
 
             {loadingTasks ? (
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-3.5 overflow-x-auto scrollbar-hide -mx-5 px-5">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="min-w-[260px] h-[280px] rounded-2xl bg-muted animate-pulse" />
+                  <div key={i} className="min-w-[280px] h-[340px] rounded-2xl bg-muted animate-pulse" />
                 ))}
               </div>
             ) : nearbyTasks.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border bg-card p-6 text-center">
+              <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center">
                 <p className="text-sm text-muted-foreground mb-3">Inga uppdrag hittades.</p>
                 <Button variant="hero" size="sm" onClick={() => navigate("/post-task")}>
                   Skapa uppdrag
                 </Button>
               </div>
             ) : (
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-2 snap-x snap-mandatory">
+              <div className="flex gap-3.5 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-2 snap-x snap-mandatory">
                 {nearbyTasks.slice(0, 3).map((task) => {
                   const budget = task.budget_max_sek || task.budget_min_sek || 0;
                   const isUrgent =
@@ -248,10 +247,10 @@ const Index = () => {
                     <Link
                       key={task.id}
                       to={`/task/${task.id}`}
-                      className="min-w-[260px] max-w-[260px] snap-start block rounded-2xl border border-border bg-card overflow-hidden shadow-card transition-all duration-200 hover:shadow-md active:scale-[0.98]"
+                      className="min-w-[280px] max-w-[280px] snap-start block rounded-2xl border border-border bg-card overflow-hidden shadow-card transition-all duration-200 hover:shadow-md active:scale-[0.98]"
                     >
                       {/* Image area */}
-                      <div className={`relative h-[140px] ${task.photo_url ? "" : catColor} flex items-center justify-center`}>
+                      <div className={`relative h-[180px] ${task.photo_url ? "" : catColor} flex items-center justify-center`}>
                         {task.photo_url ? (
                           <img
                             src={task.photo_url}
@@ -260,7 +259,7 @@ const Index = () => {
                             loading="lazy"
                           />
                         ) : (
-                          <span className="text-4xl">
+                          <span className="text-5xl">
                             {
                               {
                                 "Avfall & återvinning": "🗑️",
@@ -278,36 +277,36 @@ const Index = () => {
                           </span>
                         )}
                         {/* Timing badge */}
-                        <div className="absolute top-2.5 left-2.5">
+                        <div className="absolute top-3 left-3">
                           <Badge
-                            className={`text-[10px] font-semibold px-2 py-0.5 ${
+                            className={`text-[11px] font-semibold px-2.5 py-1 ${
                               isUrgent
                                 ? "bg-accent text-accent-foreground border-0"
-                                : "bg-white/90 text-foreground border-0"
+                                : "bg-primary text-primary-foreground border-0"
                             }`}
                           >
                             {isUrgent ? "Snabbt" : "Flexibelt"}
                           </Badge>
                         </div>
                         {/* Distance badge */}
-                        <div className="absolute bottom-2.5 right-2.5">
-                          <span className="text-[10px] font-medium bg-white/90 px-2 py-0.5 rounded-full">
+                        <div className="absolute bottom-3 right-3">
+                          <span className="text-[11px] font-semibold bg-white/95 text-foreground px-2.5 py-1 rounded-md shadow-sm">
                             {(Math.random() * 2 + 0.3).toFixed(1)} km
                           </span>
                         </div>
                       </div>
 
                       {/* Content */}
-                      <div className="p-3">
-                        <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1.5 min-h-[38px]">
+                      <div className="p-4">
+                        <h3 className="text-[15px] font-semibold text-foreground line-clamp-2 mb-2 min-h-[40px] leading-snug">
                           {task.title}
                         </h3>
-                        <p className="text-base font-bold text-accent mb-2">
+                        <p className="text-[18px] font-bold text-accent mb-2.5">
                           {budget.toLocaleString("sv-SE")} kr
                         </p>
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <div className="flex items-center justify-between text-[12px] text-muted-foreground">
                           <span className="flex items-center gap-1">
-                            <MapPin size={12} />
+                            <MapPin size={13} />
                             {task.city}
                           </span>
                           <button
@@ -316,7 +315,7 @@ const Index = () => {
                             className="p-1 rounded-full hover:bg-secondary transition-colors"
                             aria-label="Spara uppdrag"
                           >
-                            <Heart size={16} className="text-muted-foreground" />
+                            <Heart size={17} className="text-muted-foreground" />
                           </button>
                         </div>
                       </div>
