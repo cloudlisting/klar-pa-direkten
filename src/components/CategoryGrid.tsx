@@ -63,9 +63,13 @@ const CategoryGrid = () => {
               to={`/browse?category=${id}`}
               className="flex flex-col items-center justify-center gap-2 min-w-[92px] h-[96px] snap-start rounded-2xl border border-border bg-card px-2.5 py-3 shadow-sm active:scale-[0.97] transition-transform"
             >
-<div className={`flex h-11 w-11 items-center justify-center rounded-xl ${bg}`}>               <Icon size={23} className={color} strokeWidth={1.9} />
+              <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${bg}`}>
+                <Icon size={23} className={color} strokeWidth={1.9} />
               </div>
-             <span className="text-[10.5px] font-semibold text-foreground text-center leading-tight">
+              <span className="text-[10.5px] font-semibold text-foreground text-center leading-tight">
+                {name}
+              </span>
+
             </Link>
           ))}
         </div>
