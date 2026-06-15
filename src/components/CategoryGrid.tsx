@@ -44,9 +44,7 @@ const CategoryGrid = () => {
             className="group flex flex-col items-start gap-2 rounded-2xl border border-border bg-card p-5 shadow-card transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40"
           >
             <span className="text-3xl">{cat.icon}</span>
-            <span className="text-sm font-semibold text-foreground leading-tight">
-              {cat.name}
-            </span>
+            <span className="text-sm font-semibold text-foreground leading-tight">{cat.name}</span>
             {(cat as any).desc && (
               <span className="text-xs text-muted-foreground leading-snug line-clamp-2">
                 ex: {(cat as any).desc.toLowerCase()}
@@ -63,14 +61,12 @@ const CategoryGrid = () => {
             <Link
               key={id}
               to={`/browse?category=${id}`}
-              className="flex flex-col items-center justify-start gap-2.5 min-w-[108px] h-[120px] snap-start rounded-2xl border border-border bg-card px-3 py-4 shadow-sm active:scale-[0.97] transition-transform"
+              className="flex flex-col items-center justify-center gap-2 min-w-[92px] h-[96px] snap-start rounded-2xl border border-border bg-card px-2.5 py-3 shadow-sm active:scale-[0.97] transition-transform"
             >
               <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${bg}`}>
                 <Icon size={28} className={color} strokeWidth={1.8} />
               </div>
-              <span className="text-[12px] font-semibold text-foreground text-center leading-tight">
-                {name}
-              </span>
+              <span className="text-[12px] font-semibold text-foreground text-center leading-tight">{name}</span>
             </Link>
           ))}
         </div>
