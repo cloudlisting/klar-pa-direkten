@@ -94,7 +94,11 @@ const Index = () => {
         const ids = data.map((d) => d.id);
         const [{ data: offerCounts }, { data: photos }] = await Promise.all([
           supabase.from("offers").select("task_id").in("task_id", ids),
-          supabase.from("task_photos").select("task_id, url").in("task_id", ids).limit(1, { foreignTable: "task_photos" }),
+          supabase
+            .from("task_photos")
+            .select("task_id, url")
+            .in("task_id", ids)
+            .limit(1, { foreignTable: "task_photos" }),
         ]);
         const counts: Record<string, number> = {};
         offerCounts?.forEach((o) => {
@@ -104,9 +108,7 @@ const Index = () => {
         photos?.forEach((p) => {
           if (!photoMap[p.task_id]) photoMap[p.task_id] = p.url;
         });
-        setNearbyTasks(
-          data.map((d) => ({ ...d, offers_count: counts[d.id] || 0, photo_url: photoMap[d.id] }))
-        );
+        setNearbyTasks(data.map((d) => ({ ...d, offers_count: counts[d.id] || 0, photo_url: photoMap[d.id] })));
       }
       if (mounted) setLoadingTasks(false);
     };
@@ -125,45 +127,43 @@ const Index = () => {
       <section className="md:hidden bg-background">
         <div className="px-5 pt-4 pb-8">
           {/* Hero — text with overlapping image blob on right */}
-          <div className="relative mb-7 min-h-[280px]">
-            {/* Image blob */}
-            <div className="absolute -top-2 -right-6 w-[240px] h-[280px] pointer-events-none">
-              <div className="absolute inset-0 bg-primary/10 rounded-[55%_45%_50%_50%/60%_55%_45%_40%]" />
-              <img
-                src={heroImage}
-                alt="Inredning"
-                className="absolute inset-0 w-full h-full object-contain"
-              />
+          {/* Hero */}
+          <div className="relative mb-8 overflow-hidden rounded-[28px] bg-gradient-to-br from-white via-white to-primary/5 border border-border shadow-sm px-5 pt-6 pb-5 min-h-[360px]">
+            {/* Lifestyle image */}
+            <div className="absolute right-[-18px] top-[80px] w-[210px] h-[230px] pointer-events-none">
+              <div className="absolute inset-0 rounded-full bg-primary/8" />
+              <img src={heroImage} alt="Inredning" className="absolute inset-0 w-full h-full object-contain" />
             </div>
 
-            <div className="relative z-10 max-w-[58%] pt-2">
-              <h1 className="text-[34px] font-bold font-display text-foreground leading-[1.05] tracking-tight mb-4">
+            <div className="relative z-10 max-w-[72%]">
+              <h1 className="text-[36px] font-bold font-display text-foreground leading-[1.05] tracking-tight mb-4">
                 Vad behöver du hjälp med idag?
               </h1>
-              <p className="text-[14px] text-muted-foreground leading-relaxed">
+
+              <p className="text-[15px] text-muted-foreground leading-relaxed mb-6">
                 Skapa ett uppdrag på mindre än en minut och få svar från lokala utförare.
               </p>
             </div>
 
-            {/* CTA buttons — overlap into image area, larger */}
-            <div className="relative z-10 flex items-center gap-2.5 mt-6">
+            <div className="relative z-10 mt-4 flex flex-col gap-3 max-w-[72%]">
               <button
                 onClick={() => navigate("/post-task")}
-                className="flex items-center gap-2.5 h-14 px-5 rounded-2xl bg-accent text-accent-foreground text-[15px] font-semibold shadow-md active:scale-[0.97] transition-transform"
+                className="flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-accent text-accent-foreground text-[15px] font-semibold shadow-md active:scale-[0.98] transition-transform"
               >
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/25">
                   <Plus size={18} strokeWidth={3} />
                 </span>
                 Skapa uppdrag
               </button>
+
               <button
                 onClick={() => navigate("/browse")}
-                className="flex items-center gap-2 h-14 px-3.5 rounded-2xl bg-card border border-border text-[12px] font-semibold text-foreground shadow-sm active:scale-[0.97] transition-transform"
+                className="flex items-center justify-center gap-2 h-13 rounded-2xl bg-card border border-border text-[14px] font-semibold text-foreground shadow-sm active:scale-[0.98] transition-transform"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background shrink-0">
-                  <MapPin size={15} />
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground shrink-0">
+                  <MapPin size={14} />
                 </span>
-                <span className="leading-tight text-left">Se uppdrag<br/>nära dig</span>
+                Se uppdrag nära dig
               </button>
             </div>
           </div>
@@ -175,7 +175,9 @@ const Index = () => {
                 <Shield size={20} className="text-primary-foreground" />
               </div>
               <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">Verifierade profiler</p>
-              <p className="text-[10.5px] text-muted-foreground leading-snug mb-2.5 flex-1">Endast kontrollerade utförare.</p>
+              <p className="text-[10.5px] text-muted-foreground leading-snug mb-2.5 flex-1">
+                Endast kontrollerade utförare.
+              </p>
               <span className="inline-flex items-center self-start text-[10px] font-bold tracking-tight text-foreground bg-secondary px-2 py-1 rounded">
                 BankID
               </span>
@@ -185,7 +187,9 @@ const Index = () => {
                 <Shield size={20} className="text-primary-foreground" />
               </div>
               <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">Säker betalning</p>
-              <p className="text-[10.5px] text-muted-foreground leading-snug mb-2.5 flex-1">Betala tryggt direkt i appen.</p>
+              <p className="text-[10.5px] text-muted-foreground leading-snug mb-2.5 flex-1">
+                Betala tryggt direkt i appen.
+              </p>
               <div className="flex items-center gap-1 flex-wrap">
                 <span className="text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">Swish</span>
                 <span className="text-[9px] font-bold text-foreground bg-secondary px-1.5 py-0.5 rounded">MC</span>
@@ -196,7 +200,9 @@ const Index = () => {
               <div className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary">
                 <Star size={20} className="text-primary-foreground" />
               </div>
-              <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">Omdömen efter varje uppdrag</p>
+              <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">
+                Omdömen efter varje uppdrag
+              </p>
               <p className="text-[10.5px] text-muted-foreground leading-snug">Riktiga betyg från riktiga kunder.</p>
             </div>
           </div>
@@ -239,8 +245,7 @@ const Index = () => {
                 {nearbyTasks.slice(0, 3).map((task) => {
                   const budget = task.budget_max_sek || task.budget_min_sek || 0;
                   const isUrgent =
-                    task.preferred_date &&
-                    new Date(task.preferred_date).getTime() - Date.now() < 1000 * 60 * 60 * 48;
+                    task.preferred_date && new Date(task.preferred_date).getTime() - Date.now() < 1000 * 60 * 60 * 48;
                   const catColor = CATEGORY_BG_COLORS[task.category?.toLowerCase() || "other"] || "bg-gray-100";
 
                   return (
@@ -250,7 +255,9 @@ const Index = () => {
                       className="min-w-[280px] max-w-[280px] snap-start block rounded-2xl border border-border bg-card overflow-hidden shadow-card transition-all duration-200 hover:shadow-md active:scale-[0.98]"
                     >
                       {/* Image area */}
-                      <div className={`relative h-[180px] ${task.photo_url ? "" : catColor} flex items-center justify-center`}>
+                      <div
+                        className={`relative h-[180px] ${task.photo_url ? "" : catColor} flex items-center justify-center`}
+                      >
                         {task.photo_url ? (
                           <img
                             src={task.photo_url}
@@ -260,20 +267,18 @@ const Index = () => {
                           />
                         ) : (
                           <span className="text-5xl">
-                            {
-                              {
-                                "Avfall & återvinning": "🗑️",
-                                "Inköp & ärenden": "🛍️",
-                                "Flytt & transport": "📦",
-                                "Möbelmontering": "🪛",
-                                "Småfix i hemmet": "🔧",
-                                Städning: "🧹",
-                                "Trädgård & utemiljö": "🌿",
-                                "IT- & teknikhjälp": "💻",
-                                Djur: "🐶",
-                                Övrigt: "✨",
-                              }[task.category] || "📋"
-                            }
+                            {{
+                              "Avfall & återvinning": "🗑️",
+                              "Inköp & ärenden": "🛍️",
+                              "Flytt & transport": "📦",
+                              Möbelmontering: "🪛",
+                              "Småfix i hemmet": "🔧",
+                              Städning: "🧹",
+                              "Trädgård & utemiljö": "🌿",
+                              "IT- & teknikhjälp": "💻",
+                              Djur: "🐶",
+                              Övrigt: "✨",
+                            }[task.category] || "📋"}
                           </span>
                         )}
                         {/* Timing badge */}
@@ -301,9 +306,7 @@ const Index = () => {
                         <h3 className="text-[15px] font-semibold text-foreground line-clamp-2 mb-2 min-h-[40px] leading-snug">
                           {task.title}
                         </h3>
-                        <p className="text-[18px] font-bold text-accent mb-2.5">
-                          {budget.toLocaleString("sv-SE")} kr
-                        </p>
+                        <p className="text-[18px] font-bold text-accent mb-2.5">{budget.toLocaleString("sv-SE")} kr</p>
                         <div className="flex items-center justify-between text-[12px] text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <MapPin size={13} />
@@ -353,8 +356,7 @@ const Index = () => {
                   variants={fadeUp}
                   custom={1}
                 >
-                  {t("hero.title1")}{" "}
-                  <span className="text-accent">{t("hero.title2")}</span>
+                  {t("hero.title1")} <span className="text-accent">{t("hero.title2")}</span>
                 </motion.h1>
                 <motion.p
                   className="text-lg text-primary-foreground/80 mb-8 max-w-lg"
@@ -407,26 +409,24 @@ const Index = () => {
         </section>
 
         {/* Mobile: standalone live feed */}
-        <div className="lg:hidden">
-          {/* Already covered by mobile section above */}
-        </div>
+        <div className="lg:hidden">{/* Already covered by mobile section above */}</div>
 
         {/* How it works */}
         <section className="py-16 md:py-20 bg-secondary/30">
           <div className="container">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold font-display text-foreground mb-3">
-                {t("sections.howTitle")}
-              </h2>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                {t("sections.howSub")}
-              </p>
+              <h2 className="text-3xl font-bold font-display text-foreground mb-3">{t("sections.howTitle")}</h2>
+              <p className="text-muted-foreground max-w-md mx-auto">{t("sections.howSub")}</p>
             </div>
             <div className="grid gap-6 md:grid-cols-3">
               {[
                 { icon: <Zap className="text-accent" size={28} />, title: t("step1.title"), desc: t("step1.desc") },
                 { icon: <Star className="text-accent" size={28} />, title: t("step2.title"), desc: t("step2.desc") },
-                { icon: <CheckCircle className="text-accent" size={28} />, title: t("step3.title"), desc: t("step3.desc") },
+                {
+                  icon: <CheckCircle className="text-accent" size={28} />,
+                  title: t("step3.title"),
+                  desc: t("step3.desc"),
+                },
               ].map((step, i) => (
                 <motion.div
                   key={i}
@@ -459,9 +459,7 @@ const Index = () => {
           <div className="container">
             <div className="flex items-end justify-between mb-8">
               <div>
-                <h2 className="text-3xl font-bold font-display text-foreground mb-2">
-                  {t("sections.categories")}
-                </h2>
+                <h2 className="text-3xl font-bold font-display text-foreground mb-2">{t("sections.categories")}</h2>
                 <p className="text-muted-foreground">{t("sections.categoriesSub")}</p>
               </div>
               <Button variant="ghost" asChild className="hidden sm:flex">
@@ -478,12 +476,8 @@ const Index = () => {
         <section className="py-16 bg-primary">
           <div className="container text-center">
             <Shield className="mx-auto mb-4 text-primary-foreground/80" size={36} />
-            <h2 className="text-3xl font-bold font-display text-primary-foreground mb-3">
-              {t("sections.trustTitle")}
-            </h2>
-            <p className="text-primary-foreground/80 max-w-md mx-auto mb-8">
-              {t("sections.trustText")}
-            </p>
+            <h2 className="text-3xl font-bold font-display text-primary-foreground mb-3">{t("sections.trustTitle")}</h2>
+            <p className="text-primary-foreground/80 max-w-md mx-auto mb-8">{t("sections.trustText")}</p>
             <Button variant="accent" size="lg" asChild>
               <Link to="/post-task">{t("sections.trustCta")}</Link>
             </Button>
