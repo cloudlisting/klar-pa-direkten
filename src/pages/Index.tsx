@@ -125,99 +125,77 @@ const Index = () => {
     <Layout>
       {/* ============ MOBILE APP HOME ============ */}
       <section className="md:hidden bg-background">
-        <div className="px-5 pt-4 pb-28">
-          {/* Hero */}
-          <div className="mb-6 pt-4">
-            <div className="grid grid-cols-[1.05fr_0.95fr] gap-3 items-center mb-5">
+        <div className="px-4 pt-3 pb-28">
+          {/* Hero card */}
+          <div className="mb-4 rounded-[28px] border border-border bg-gradient-to-br from-white via-white to-primary/5 shadow-sm px-4 py-5">
+            <div className="grid grid-cols-[1.1fr_0.9fr] gap-3 items-center mb-4">
               <div>
-                <h1 className="text-[29px] font-bold font-display text-foreground leading-[1.05] tracking-tight mb-4">
+                <h1 className="text-[24px] font-bold font-display text-foreground leading-[1.05] tracking-tight mb-2">
                   Vad behöver du hjälp med idag?
                 </h1>
-
-                <p className="text-[14.5px] text-muted-foreground leading-relaxed">
+                <p className="text-[12.5px] text-muted-foreground leading-snug">
                   Skapa ett uppdrag på mindre än en minut och få svar från lokala utförare.
                 </p>
               </div>
 
-              <div className="relative h-[190px] overflow-hidden rounded-[28px] bg-primary/5">
-                <div className="absolute inset-0 rounded-full bg-primary/8 scale-90" />
+              <div className="relative h-[120px] overflow-hidden rounded-[22px] bg-primary/5">
                 <img src={heroImage} alt="Inredning" className="absolute inset-0 w-full h-full object-cover" />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5">
               <button
                 onClick={() => navigate("/post-task")}
-                className="flex items-center justify-center gap-2 h-[50px] rounded-2xl bg-accent text-accent-foreground text-[14px] font-semibold shadow-md active:scale-[0.98] transition-transform"
+                className="flex items-center justify-center gap-1.5 h-[44px] rounded-2xl bg-accent text-accent-foreground text-[13px] font-semibold shadow-md active:scale-[0.98] transition-transform"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/25 shrink-0">
-                  <Plus size={18} strokeWidth={3} />
-                </span>
+                <Plus size={16} strokeWidth={3} />
                 <span className="whitespace-nowrap">Skapa uppdrag</span>
               </button>
 
               <button
                 onClick={() => navigate("/browse")}
-                className="flex items-center justify-center gap-2 h-[54px] rounded-2xl bg-card border border-border text-[13px] font-semibold text-foreground shadow-sm active:scale-[0.98] transition-transform"
+                className="flex items-center justify-center gap-1.5 h-[44px] rounded-2xl bg-card border border-border text-[13px] font-semibold text-foreground shadow-sm active:scale-[0.98] transition-transform"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shrink-0">
-                  <MapPin size={14} />
-                </span>
-                <span className="leading-tight text-left">
-                  Se uppdrag
-                  <br />
-                  nära dig
-                </span>
+                <MapPin size={14} className="text-primary" />
+                <span className="whitespace-nowrap">Se uppdrag nära dig</span>
               </button>
             </div>
           </div>
+
           {/* Trust strip */}
-          <div className="mb-7 rounded-2xl border border-border bg-card px-3.5 py-3 shadow-sm">
+          <div className="mb-5 rounded-2xl border border-border bg-card px-3 py-2.5 shadow-sm">
             <div className="grid grid-cols-3 divide-x divide-border">
               <div className="flex flex-col items-center px-2 text-center">
-                <Shield size={18} className="mb-1.5 text-primary" />
+                <Shield size={16} className="mb-1 text-primary" />
                 <p className="text-[10.5px] font-semibold text-foreground leading-tight">Verifierade</p>
                 <p className="text-[8.5px] text-muted-foreground leading-tight">BankID</p>
               </div>
-
               <div className="flex flex-col items-center px-2 text-center">
-                <Shield size={18} className="mb-1.5 text-primary" />
+                <CheckCircle size={16} className="mb-1 text-primary" />
                 <p className="text-[10.5px] font-semibold text-foreground leading-tight">Säker betalning</p>
                 <p className="text-[8.5px] text-muted-foreground leading-tight">Swish · Klarna</p>
               </div>
-
               <div className="flex flex-col items-center px-2 text-center">
-                <Star size={18} className="mb-1.5 text-primary" />
+                <Star size={16} className="mb-1 text-primary" />
                 <p className="text-[10.5px] font-semibold text-foreground leading-tight">Omdömen</p>
                 <p className="text-[8.5px] text-muted-foreground leading-tight">Efter jobb</p>
               </div>
             </div>
           </div>
 
-          {/* Popular services */}
+          {/* Nearby tasks - horizontal cards (moved above popular) */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-[20px] font-bold font-display text-foreground">Populära tjänster</h2>
-              <Link to="/browse" className="text-[13px] text-primary font-semibold flex items-center gap-1">
-                Visa alla <ArrowRight size={14} />
-              </Link>
-            </div>
-            <CategoryGrid />
-          </div>
-
-          {/* Nearby tasks - horizontal cards */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[20px] font-bold font-display text-foreground">Uppdrag nära dig</h2>
+              <h2 className="text-[19px] font-bold font-display text-foreground">Uppdrag nära dig</h2>
               <Link to="/browse" className="text-[13px] text-primary font-semibold flex items-center gap-1">
                 Visa alla <ArrowRight size={14} />
               </Link>
             </div>
 
             {loadingTasks ? (
-              <div className="flex gap-3.5 overflow-x-auto scrollbar-hide -mx-5 px-5">
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="min-w-[280px] h-[340px] rounded-2xl bg-muted animate-pulse" />
+                  <div key={i} className="min-w-[180px] h-[260px] rounded-2xl bg-muted animate-pulse" />
                 ))}
               </div>
             ) : nearbyTasks.length === 0 ? (
@@ -228,8 +206,8 @@ const Index = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex gap-3.5 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-2 snap-x snap-mandatory">
-                {nearbyTasks.slice(0, 3).map((task) => {
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-2 snap-x">
+                {nearbyTasks.slice(0, 6).map((task) => {
                   const budget = task.budget_max_sek || task.budget_min_sek || 0;
                   const isUrgent =
                     task.preferred_date && new Date(task.preferred_date).getTime() - Date.now() < 1000 * 60 * 60 * 48;
@@ -239,11 +217,10 @@ const Index = () => {
                     <Link
                       key={task.id}
                       to={`/task/${task.id}`}
-                      className="min-w-[280px] max-w-[280px] snap-start block rounded-2xl border border-border bg-card overflow-hidden shadow-card transition-all duration-200 hover:shadow-md active:scale-[0.98]"
+                      className="min-w-[180px] max-w-[180px] snap-start block rounded-2xl border border-border bg-card overflow-hidden shadow-card transition-all duration-200 hover:shadow-md active:scale-[0.98]"
                     >
-                      {/* Image area */}
                       <div
-                        className={`relative h-[180px] ${task.photo_url ? "" : catColor} flex items-center justify-center`}
+                        className={`relative h-[125px] ${task.photo_url ? "" : catColor} flex items-center justify-center`}
                       >
                         {task.photo_url ? (
                           <img
@@ -253,7 +230,7 @@ const Index = () => {
                             loading="lazy"
                           />
                         ) : (
-                          <span className="text-5xl">
+                          <span className="text-4xl">
                             {{
                               "Avfall & återvinning": "🗑️",
                               "Inköp & ärenden": "🛍️",
@@ -268,10 +245,9 @@ const Index = () => {
                             }[task.category] || "📋"}
                           </span>
                         )}
-                        {/* Timing badge */}
-                        <div className="absolute top-3 left-3">
+                        <div className="absolute top-2 left-2">
                           <Badge
-                            className={`text-[11px] font-semibold px-2.5 py-1 ${
+                            className={`text-[10px] font-semibold px-2 py-0.5 ${
                               isUrgent
                                 ? "bg-accent text-accent-foreground border-0"
                                 : "bg-primary text-primary-foreground border-0"
@@ -280,32 +256,30 @@ const Index = () => {
                             {isUrgent ? "Snabbt" : "Flexibelt"}
                           </Badge>
                         </div>
-                        {/* Distance badge */}
-                        <div className="absolute bottom-3 right-3">
-                          <span className="text-[11px] font-semibold bg-white/95 text-foreground px-2.5 py-1 rounded-md shadow-sm">
+                        <div className="absolute bottom-2 right-2">
+                          <span className="text-[10px] font-semibold bg-white/95 text-foreground px-2 py-0.5 rounded-md shadow-sm">
                             {(Math.random() * 2 + 0.3).toFixed(1)} km
                           </span>
                         </div>
                       </div>
 
-                      {/* Content */}
-                      <div className="p-4">
-                        <h3 className="text-[15px] font-semibold text-foreground line-clamp-2 mb-2 min-h-[40px] leading-snug">
+                      <div className="p-3">
+                        <h3 className="text-[13px] font-semibold text-foreground line-clamp-2 mb-1.5 min-h-[34px] leading-snug">
                           {task.title}
                         </h3>
-                        <p className="text-[18px] font-bold text-accent mb-2.5">{budget.toLocaleString("sv-SE")} kr</p>
-                        <div className="flex items-center justify-between text-[12px] text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin size={13} />
+                        <p className="text-[15px] font-bold text-accent mb-1.5">{budget.toLocaleString("sv-SE")} kr</p>
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                          <span className="flex items-center gap-1 truncate">
+                            <MapPin size={11} />
                             {task.city}
                           </span>
                           <button
                             type="button"
                             onClick={(e) => e.preventDefault()}
-                            className="p-1 rounded-full hover:bg-secondary transition-colors"
+                            className="p-1 rounded-full hover:bg-secondary transition-colors shrink-0"
                             aria-label="Spara uppdrag"
                           >
-                            <Heart size={17} className="text-muted-foreground" />
+                            <Heart size={15} className="text-muted-foreground" />
                           </button>
                         </div>
                       </div>
@@ -314,6 +288,17 @@ const Index = () => {
                 })}
               </div>
             )}
+          </div>
+
+          {/* Popular services */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-[19px] font-bold font-display text-foreground">Populära tjänster</h2>
+              <Link to="/browse" className="text-[13px] text-primary font-semibold flex items-center gap-1">
+                Visa alla <ArrowRight size={14} />
+              </Link>
+            </div>
+            <CategoryGrid />
           </div>
         </div>
       </section>
