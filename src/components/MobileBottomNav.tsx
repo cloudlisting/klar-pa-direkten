@@ -21,20 +21,21 @@ const MobileBottomNav = () => {
       className="fixed bottom-0 inset-x-0 z-50 md:hidden border-t border-border bg-card/95 backdrop-blur-lg pb-safe"
       aria-label="Mobilnavigation"
     >
-      <ul className="grid grid-cols-5 items-end">
+      <ul className="grid grid-cols-5 items-end px-2 pt-1.5 pb-1">
         {items.map((item) => {
           const active = item.match(location.pathname);
           const Icon = item.icon;
           if (item.center) {
             return (
-              <li key={item.to} className="flex justify-center -mt-5">
+              <li key={item.to} className="flex flex-col items-center -mt-7">
                 <Link
                   to={item.to}
                   aria-label={item.label}
-                  className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg ring-4 ring-card transition-transform active:scale-95"
+                  className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-xl ring-4 ring-card transition-transform active:scale-95"
                 >
-                  <Icon size={26} strokeWidth={2.4} />
+                  <Icon size={30} strokeWidth={2.6} />
                 </Link>
+                <span className="text-[10px] font-semibold text-accent mt-1 leading-none">{item.label}</span>
               </li>
             );
           }
@@ -43,7 +44,7 @@ const MobileBottomNav = () => {
               <Link
                 to={item.to}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 py-2.5 min-h-[56px] text-[10px] font-medium transition-colors",
+                  "flex flex-col items-center justify-center gap-1.5 py-2.5 min-h-[60px] text-[10px] font-medium transition-colors",
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
