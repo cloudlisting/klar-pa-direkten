@@ -6,14 +6,15 @@ import Layout from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Send, ArrowLeft } from "lucide-react";
+import { MessageSquare, Send, ArrowLeft, ImagePlus, Camera, ExternalLink, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import TrustBadges from "@/components/TrustBadges";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 
 type ChatThread = Tables<"chat_threads"> & {
-  task?: { title: string };
+  task?: { title: string; id: string };
 };
 type ChatMessage = Tables<"chat_messages">;
 
@@ -28,6 +29,10 @@ const Messages = () => {
   const [loadingThreads, setLoadingThreads] = useState(true);
   const [profiles, setProfiles] = useState<Record<string, Tables<"profiles">>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!loading && !user) {
@@ -84,7 +89,7 @@ const Messages = () => {
   const fetchThreads = async () => {
     const { data, error } = await supabase
       .from("chat_threads")
-      .select("*, task:tasks(title)")
+      .select("*, task:tasks(id, title)")
       .or(`customer_user_id.eq.${user!.id},tasker_user_id.eq.${user!.id}`)
       .order("created_at", { ascending: false });
 
@@ -133,6 +138,59 @@ const Messages = () => {
 
     setNewMessage("");
   };
+
+  const handleMediaUpload = async (file: File) => {
+    if (!selectedThread || !file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Filen är för stor (max 10MB)");
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${selectedThread.id}/${user!.id}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("chat-media")
+        .upload(path, file, { contentType: file.type });
+      if (upErr) throw upErr;
+
+      const { error: insErr } = await supabase.from("chat_messages").insert({
+        thread_id: selectedThread.id,
+        sender_user_id: user!.id,
+        body: null as any,
+        media_url: path,
+        media_type: file.type,
+      } as any);
+      if (insErr) throw insErr;
+    } catch (err: any) {
+      toast.error(err.message || "Kunde inte ladda upp bild");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Generate signed URLs for media messages
+  useEffect(() => {
+    const loadSigned = async () => {
+      const toFetch = messages.filter(
+        (m: any) => m.media_url && !signedUrls[m.media_url]
+      );
+      if (toFetch.length === 0) return;
+      const updates: Record<string, string> = {};
+      await Promise.all(
+        toFetch.map(async (m: any) => {
+          const { data } = await supabase.storage
+            .from("chat-media")
+            .createSignedUrl(m.media_url, 3600);
+          if (data?.signedUrl) updates[m.media_url] = data.signedUrl;
+        })
+      );
+      if (Object.keys(updates).length > 0) {
+        setSignedUrls((prev) => ({ ...prev, ...updates }));
+      }
+    };
+    loadSigned();
+  }, [messages]);
 
   const getOtherUserId = (thread: ChatThread) => {
     return thread.customer_user_id === user?.id ? thread.tasker_user_id : thread.customer_user_id;
@@ -218,9 +276,15 @@ const Messages = () => {
                   >
                     {profiles[getOtherUserId(selectedThread)]?.name || "Användare"}
                   </Link>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {(selectedThread as any).task?.title}
-                  </p>
+                  {(selectedThread as any).task?.id && (
+                    <Link
+                      to={`/task/${(selectedThread as any).task.id}`}
+                      className="flex items-center gap-1 text-xs text-primary hover:underline truncate mt-0.5"
+                    >
+                      <span className="truncate">{(selectedThread as any).task?.title}</span>
+                      <ExternalLink size={11} className="shrink-0" />
+                    </Link>
+                  )}
                   {profiles[getOtherUserId(selectedThread)] && (
                     <div className="mt-1.5">
                       <TrustBadges
@@ -237,7 +301,7 @@ const Messages = () => {
                     <p className="text-sm text-muted-foreground">Inga meddelanden ännu. Skriv det första!</p>
                   </div>
                 )}
-                {messages.map((msg) => (
+                {messages.map((msg: any) => (
                   <motion.div
                     key={msg.id}
                     initial={{ opacity: 0, y: 5 }}
@@ -245,14 +309,25 @@ const Messages = () => {
                     className={`flex ${msg.sender_user_id === user?.id ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[75%] rounded-xl px-4 py-2 ${
+                      className={`max-w-[75%] rounded-xl px-3 py-2 ${
                         msg.sender_user_id === user?.id
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary text-secondary-foreground"
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap break-words">{msg.body}</p>
-                      <p className="text-xs opacity-70 mt-1">
+                      {msg.media_url && signedUrls[msg.media_url] && (
+                        <a href={signedUrls[msg.media_url]} target="_blank" rel="noopener noreferrer">
+                          <img
+                            src={signedUrls[msg.media_url]}
+                            alt="Bifogad bild"
+                            className="rounded-lg max-h-64 mb-1"
+                          />
+                        </a>
+                      )}
+                      {msg.body && (
+                        <p className="text-sm whitespace-pre-wrap break-words px-1">{msg.body}</p>
+                      )}
+                      <p className="text-xs opacity-70 mt-1 px-1">
                         {new Date(msg.created_at).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
@@ -260,12 +335,54 @@ const Messages = () => {
                 ))}
                 <div ref={messagesEndRef} />
               </div>
-              <form onSubmit={sendMessage} className="p-4 border-t border-border bg-card flex gap-2">
+              <form onSubmit={sendMessage} className="p-3 border-t border-border bg-card flex gap-2 items-center">
+                <input
+                  ref={galleryInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleMediaUpload(f);
+                    e.target.value = "";
+                  }}
+                />
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleMediaUpload(f);
+                    e.target.value = "";
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  disabled={uploading}
+                  onClick={() => galleryInputRef.current?.click()}
+                  aria-label="Bifoga från galleri"
+                >
+                  {uploading ? <Loader2 size={18} className="animate-spin" /> : <ImagePlus size={18} />}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  disabled={uploading}
+                  onClick={() => cameraInputRef.current?.click()}
+                  aria-label="Ta bild med kamera"
+                >
+                  <Camera size={18} />
+                </Button>
                 <Input
                   placeholder="Skriv ett meddelande..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  autoFocus
                 />
                 <Button type="submit" variant="hero" size="icon" disabled={!newMessage.trim()}>
                   <Send size={18} />

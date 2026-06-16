@@ -16,25 +16,31 @@ export type Database = {
     Tables: {
       chat_messages: {
         Row: {
-          body: string
+          body: string | null
           created_at: string
           id: string
+          media_type: string | null
+          media_url: string | null
           read_at: string | null
           sender_user_id: string
           thread_id: string
         }
         Insert: {
-          body: string
+          body?: string | null
           created_at?: string
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           read_at?: string | null
           sender_user_id: string
           thread_id: string
         }
         Update: {
-          body?: string
+          body?: string | null
           created_at?: string
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           read_at?: string | null
           sender_user_id?: string
           thread_id?: string

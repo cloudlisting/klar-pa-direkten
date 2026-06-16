@@ -8,7 +8,8 @@ const items = [
   { to: "/", icon: Home, label: "Hem", match: (p: string) => p === "/" },
   { to: "/browse", icon: Search, label: "Uppdrag", match: (p: string) => p.startsWith("/browse") || p.startsWith("/task/") },
   { to: "/post-task", icon: Plus, label: "Skapa", center: true, match: (p: string) => p.startsWith("/post-task") },
-  { to: "/my-tasks", icon: ClipboardList, label: "Mina uppdrag", match: (p: string) => p.startsWith("/my-tasks") },
+  { to: "/messages", icon: MessageSquare, label: "Chatt", match: (p: string) => p.startsWith("/messages") },
+  { to: "/my-tasks", icon: ClipboardList, label: "Mina", match: (p: string) => p.startsWith("/my-tasks") },
   { to: "/dashboard", icon: User, label: "Profil", match: (p: string) => p.startsWith("/dashboard") || p.startsWith("/settings") },
 ];
 
@@ -21,7 +22,7 @@ const MobileBottomNav = () => {
       className="fixed bottom-0 inset-x-0 z-50 md:hidden border-t border-border bg-card/95 backdrop-blur-lg pb-safe"
       aria-label="Mobilnavigation"
     >
-      <ul className="grid grid-cols-5 items-end px-2 pt-1.5 pb-1">
+      <ul className="grid grid-cols-6 items-end px-1 pt-1.5 pb-1">
         {items.map((item) => {
           const active = item.match(location.pathname);
           const Icon = item.icon;
