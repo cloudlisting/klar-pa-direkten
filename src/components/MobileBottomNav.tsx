@@ -9,7 +9,7 @@ const items = [
   { to: "/browse", icon: Search, label: "Uppdrag", match: (p: string) => p.startsWith("/browse") || p.startsWith("/task/") },
   { to: "/post-task", icon: Plus, label: "Skapa", center: true, match: (p: string) => p.startsWith("/post-task") },
   { to: "/messages", icon: MessageSquare, label: "Chatt", match: (p: string) => p.startsWith("/messages") },
-  { to: "/my-tasks", icon: ClipboardList, label: "Mina uppdrag", match: (p: string) => p.startsWith("/my-tasks") },
+  { to: "/my-tasks", icon: ClipboardList, label: "Mina", match: (p: string) => p.startsWith("/my-tasks") },
   { to: "/dashboard", icon: User, label: "Profil", match: (p: string) => p.startsWith("/dashboard") || p.startsWith("/settings") },
 ];
 
