@@ -384,6 +384,69 @@ export type Database = {
           },
         ]
       }
+      service_listings: {
+        Row: {
+          category: string
+          city: string | null
+          cover_image_url: string | null
+          created_at: string
+          description: string
+          id: string
+          price_sek: number
+          price_type: string
+          status: string
+          tasker_user_id: string
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          category: string
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          price_sek: number
+          price_type?: string
+          status?: string
+          tasker_user_id: string
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          category?: string
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          price_sek?: number
+          price_type?: string
+          status?: string
+          tasker_user_id?: string
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_listings_tasker_user_id_fkey"
+            columns: ["tasker_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_listings_tasker_user_id_fkey"
+            columns: ["tasker_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_photos: {
         Row: {
           created_at: string
@@ -458,6 +521,63 @@ export type Database = {
         }
         Relationships: []
       }
+      tasker_services: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          price_sek: number | null
+          price_type: string
+          sort_order: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          price_sek?: number | null
+          price_type?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          price_sek?: number | null
+          price_type?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasker_services_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasker_services_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           address_optional: string | null
@@ -480,6 +600,8 @@ export type Database = {
           longitude: number | null
           preferred_date: string | null
           preferred_time: string | null
+          source_service_listing_id: string | null
+          source_tasker_service_id: string | null
           status: Database["public"]["Enums"]["task_status"]
           timing_type: string
           title: string
@@ -506,6 +628,8 @@ export type Database = {
           longitude?: number | null
           preferred_date?: string | null
           preferred_time?: string | null
+          source_service_listing_id?: string | null
+          source_tasker_service_id?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           timing_type?: string
           title: string
@@ -532,12 +656,29 @@ export type Database = {
           longitude?: number | null
           preferred_date?: string | null
           preferred_time?: string | null
+          source_service_listing_id?: string | null
+          source_tasker_service_id?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           timing_type?: string
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tasks_source_service_listing_id_fkey"
+            columns: ["source_service_listing_id"]
+            isOneToOne: false
+            referencedRelation: "service_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_source_tasker_service_id_fkey"
+            columns: ["source_tasker_service_id"]
+            isOneToOne: false
+            referencedRelation: "tasker_services"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
