@@ -29,6 +29,10 @@ const Messages = () => {
   const [loadingThreads, setLoadingThreads] = useState(true);
   const [profiles, setProfiles] = useState<Record<string, Tables<"profiles">>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!loading && !user) {
