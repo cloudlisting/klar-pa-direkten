@@ -276,9 +276,15 @@ const Messages = () => {
                   >
                     {profiles[getOtherUserId(selectedThread)]?.name || "Användare"}
                   </Link>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {(selectedThread as any).task?.title}
-                  </p>
+                  {(selectedThread as any).task?.id && (
+                    <Link
+                      to={`/task/${(selectedThread as any).task.id}`}
+                      className="flex items-center gap-1 text-xs text-primary hover:underline truncate mt-0.5"
+                    >
+                      <span className="truncate">{(selectedThread as any).task?.title}</span>
+                      <ExternalLink size={11} className="shrink-0" />
+                    </Link>
+                  )}
                   {profiles[getOtherUserId(selectedThread)] && (
                     <div className="mt-1.5">
                       <TrustBadges
