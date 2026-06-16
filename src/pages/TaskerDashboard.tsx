@@ -6,7 +6,8 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import TaskCard from "@/components/TaskCard";
-import { Briefcase, DollarSign, Star, Search, Filter } from "lucide-react";
+import { Briefcase, DollarSign, Star, Search, Filter, Plus, Sparkles } from "lucide-react";
+import TaskerServicesSection from "@/components/TaskerServicesSection";
 import { motion } from "framer-motion";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -199,6 +200,31 @@ const TaskerDashboard = () => {
                 </div>
               </div>
             )}
+
+            {/* Mina tjänster (profil) */}
+            {user && (
+              <div className="rounded-xl border border-border bg-card p-6 shadow-card">
+                <TaskerServicesSection profileUserId={user.id} isOwner={true} taskerName="dig" />
+              </div>
+            )}
+
+            {/* Publika annonser */}
+            <div className="rounded-xl border border-border bg-card p-6 shadow-card">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h2 className="font-semibold text-foreground flex items-center gap-2">
+                    <Sparkles size={16} className="text-accent" /> Mina annonser
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">Publicera vad du erbjuder så kunder kan beställa direkt.</p>
+                </div>
+                <Button size="sm" variant="hero" asChild>
+                  <Link to="/services/new"><Plus size={14} /> Ny annons</Link>
+                </Button>
+              </div>
+              <Button variant="outline" size="sm" asChild className="w-full">
+                <Link to="/services">Se alla erbjudna tjänster</Link>
+              </Button>
+            </div>
 
             {/* Suggested tasks */}
             <div>
