@@ -25,6 +25,9 @@ import CategoryPage from "./pages/CategoryPage";
 import CityPage from "./pages/CityPage";
 import PublicProfile from "./pages/PublicProfile";
 import NotFound from "./pages/NotFound";
+import Services from "./pages/Services";
+import ServiceDetail from "./pages/ServiceDetail";
+import ServiceFormPage from "./pages/ServiceFormPage";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +78,10 @@ const App = () => (
             <Route path="/kategorier/:slug" element={<CategoryPage />} />
             <Route path="/stad/:slug" element={<CityPage />} />
             <Route path="/profile/:userId" element={<PublicProfile />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/services/new" element={<ServiceFormPage />} />
+            <Route path="/services/:id" element={<ServiceDetail />} />
+            <Route path="/services/:id/edit" element={<ServiceFormPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

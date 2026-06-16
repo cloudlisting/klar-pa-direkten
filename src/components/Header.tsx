@@ -19,6 +19,7 @@ const Header = () => {
 
   const navLinks = [
     { to: "/browse", label: t("nav.findTasks") },
+    { to: "/services", label: "Tjänster" },
     { to: "/post-task", label: t("nav.postTask") },
     { to: "/how-it-works", label: t("nav.howItWorks") },
   ];
