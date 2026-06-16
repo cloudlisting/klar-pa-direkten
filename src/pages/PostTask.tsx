@@ -246,6 +246,12 @@ const PostTask = () => {
             </p>
           </div>
 
+          {preTaskerId && (
+            <div className="mb-4 rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm text-foreground">
+              Du beställer från <span className="font-semibold">{preTaskerName || "vald tasker"}</span>. Uppdraget tilldelas direkt – fyll bara i plats och tid.
+            </div>
+          )}
+
           <div className="space-y-6 rounded-2xl border border-border bg-card p-5 md:p-7 shadow-card">
             {/* Titel */}
             <div>
