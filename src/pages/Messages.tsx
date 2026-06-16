@@ -139,6 +139,59 @@ const Messages = () => {
     setNewMessage("");
   };
 
+  const handleMediaUpload = async (file: File) => {
+    if (!selectedThread || !file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Filen är för stor (max 10MB)");
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${selectedThread.id}/${user!.id}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("chat-media")
+        .upload(path, file, { contentType: file.type });
+      if (upErr) throw upErr;
+
+      const { error: insErr } = await supabase.from("chat_messages").insert({
+        thread_id: selectedThread.id,
+        sender_user_id: user!.id,
+        body: null as any,
+        media_url: path,
+        media_type: file.type,
+      } as any);
+      if (insErr) throw insErr;
+    } catch (err: any) {
+      toast.error(err.message || "Kunde inte ladda upp bild");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Generate signed URLs for media messages
+  useEffect(() => {
+    const loadSigned = async () => {
+      const toFetch = messages.filter(
+        (m: any) => m.media_url && !signedUrls[m.media_url]
+      );
+      if (toFetch.length === 0) return;
+      const updates: Record<string, string> = {};
+      await Promise.all(
+        toFetch.map(async (m: any) => {
+          const { data } = await supabase.storage
+            .from("chat-media")
+            .createSignedUrl(m.media_url, 3600);
+          if (data?.signedUrl) updates[m.media_url] = data.signedUrl;
+        })
+      );
+      if (Object.keys(updates).length > 0) {
+        setSignedUrls((prev) => ({ ...prev, ...updates }));
+      }
+    };
+    loadSigned();
+  }, [messages]);
+
   const getOtherUserId = (thread: ChatThread) => {
     return thread.customer_user_id === user?.id ? thread.tasker_user_id : thread.customer_user_id;
   };
