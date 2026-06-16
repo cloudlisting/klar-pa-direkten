@@ -22,7 +22,7 @@ const MobileBottomNav = () => {
       className="fixed bottom-0 inset-x-0 z-50 md:hidden border-t border-border bg-card/95 backdrop-blur-lg pb-safe"
       aria-label="Mobilnavigation"
     >
-      <ul className="grid grid-cols-5 items-end px-2 pt-1.5 pb-1">
+      <ul className="grid grid-cols-6 items-end px-1 pt-1.5 pb-1">
         {items.map((item) => {
           const active = item.match(location.pathname);
           const Icon = item.icon;
