@@ -89,7 +89,7 @@ const Messages = () => {
   const fetchThreads = async () => {
     const { data, error } = await supabase
       .from("chat_threads")
-      .select("*, task:tasks(title)")
+      .select("*, task:tasks(id, title)")
       .or(`customer_user_id.eq.${user!.id},tasker_user_id.eq.${user!.id}`)
       .order("created_at", { ascending: false });
 
