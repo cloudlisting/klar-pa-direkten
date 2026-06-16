@@ -4,10 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import TrustBadges from "@/components/TrustBadges";
 import ReviewsList from "@/components/ReviewsList";
+import TaskerServicesSection from "@/components/TaskerServicesSection";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ShieldCheck, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
@@ -15,6 +17,7 @@ type TaskerProfile = Tables<"tasker_profiles">;
 
 const PublicProfile = () => {
   const { userId } = useParams();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [taskerProfile, setTaskerProfile] = useState<TaskerProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -121,6 +124,16 @@ const PublicProfile = () => {
             </div>
           )}
         </motion.div>
+
+        {taskerProfile && (
+          <div className="mt-6 rounded-2xl border border-border bg-card p-5 md:p-6 shadow-card">
+            <TaskerServicesSection
+              profileUserId={profile.id}
+              isOwner={user?.id === profile.id}
+              taskerName={profile.name}
+            />
+          </div>
+        )}
 
         <div className="mt-8">
           <h2 className="text-xl font-bold font-display text-foreground mb-4">

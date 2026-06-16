@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import CategoryGrid from "@/components/CategoryGrid";
 import HeroTaskFeed from "@/components/HeroTaskFeed";
 import ServiceMarquee from "@/components/ServiceMarquee";
+import NearbyServicesRow from "@/components/NearbyServicesRow";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Shield, Zap, Star, CheckCircle, Plus, MapPin, Heart, Clock } from "lucide-react";
 import { motion } from "framer-motion";
@@ -289,6 +290,9 @@ const Index = () => {
               </div>
             )}
           </div>
+          {/* Offered services row */}
+          <NearbyServicesRow city={userCity ?? null} />
+
 
           {/* Popular services */}
           <div className="mb-6">

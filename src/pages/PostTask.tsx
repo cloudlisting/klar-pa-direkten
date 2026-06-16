@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useState, useEffect, useRef } from "react";
 import { Upload, MapPin, Loader2, Check, X, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,11 +20,20 @@ const PostTask = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [searchParams] = useSearchParams();
+
+  const preTaskerId = searchParams.get("tasker");
+  const preTaskerName = searchParams.get("tasker_name");
+  const preServiceListingId = searchParams.get("service_id");
+  const preTaskerServiceId = searchParams.get("tasker_service_id");
+  const preCategory = searchParams.get("category");
+  const preTitle = searchParams.get("title");
+  const prePrice = searchParams.get("price");
 
   const [submitting, setSubmitting] = useState(false);
   const [createdTaskId, setCreatedTaskId] = useState<string | null>(null);
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(preTitle ?? "");
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
@@ -42,7 +51,7 @@ const PostTask = () => {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState(prePrice ?? "");
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
@@ -148,7 +157,7 @@ const PostTask = () => {
         .insert({
           customer_user_id: uid,
           title: title.trim(),
-          category: DEFAULT_CATEGORY,
+          category: preCategory || DEFAULT_CATEGORY,
           description: description.trim(),
           city: city.trim(),
           address_optional: addressText.trim() || null,
@@ -164,6 +173,9 @@ const PostTask = () => {
           budget_max_sek: priceNum,
           is_remote_possible: false,
           status: "published" as const,
+          assigned_tasker_id: preTaskerId || null,
+          source_service_listing_id: preServiceListingId || null,
+          source_tasker_service_id: preTaskerServiceId || null,
         } as any)
         .select("id")
         .single();
@@ -233,6 +245,12 @@ const PostTask = () => {
               Beskriv uppdraget, välj plats och föreslå ett pris.
             </p>
           </div>
+
+          {preTaskerId && (
+            <div className="mb-4 rounded-xl border border-primary/30 bg-primary/5 p-3 text-sm text-foreground">
+              Du beställer från <span className="font-semibold">{preTaskerName || "vald tasker"}</span>. Uppdraget tilldelas direkt – fyll bara i plats och tid.
+            </div>
+          )}
 
           <div className="space-y-6 rounded-2xl border border-border bg-card p-5 md:p-7 shadow-card">
             {/* Titel */}
