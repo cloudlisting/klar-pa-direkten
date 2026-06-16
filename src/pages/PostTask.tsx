@@ -157,7 +157,7 @@ const PostTask = () => {
         .insert({
           customer_user_id: uid,
           title: title.trim(),
-          category: DEFAULT_CATEGORY,
+          category: preCategory || DEFAULT_CATEGORY,
           description: description.trim(),
           city: city.trim(),
           address_optional: addressText.trim() || null,
@@ -173,6 +173,9 @@ const PostTask = () => {
           budget_max_sek: priceNum,
           is_remote_possible: false,
           status: "published" as const,
+          assigned_tasker_id: preTaskerId || null,
+          source_service_listing_id: preServiceListingId || null,
+          source_tasker_service_id: preTaskerServiceId || null,
         } as any)
         .select("id")
         .single();
