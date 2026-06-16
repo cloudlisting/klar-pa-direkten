@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useState, useEffect, useRef } from "react";
 import { Upload, MapPin, Loader2, Check, X, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,11 +20,20 @@ const PostTask = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [searchParams] = useSearchParams();
+
+  const preTaskerId = searchParams.get("tasker");
+  const preTaskerName = searchParams.get("tasker_name");
+  const preServiceListingId = searchParams.get("service_id");
+  const preTaskerServiceId = searchParams.get("tasker_service_id");
+  const preCategory = searchParams.get("category");
+  const preTitle = searchParams.get("title");
+  const prePrice = searchParams.get("price");
 
   const [submitting, setSubmitting] = useState(false);
   const [createdTaskId, setCreatedTaskId] = useState<string | null>(null);
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(preTitle ?? "");
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
@@ -42,7 +51,7 @@ const PostTask = () => {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState(prePrice ?? "");
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
