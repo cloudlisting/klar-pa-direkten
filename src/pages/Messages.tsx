@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
 
 type ChatThread = Tables<"chat_threads"> & {
-  task?: { title: string };
+  task?: { title: string; id: string };
 };
 type ChatMessage = Tables<"chat_messages">;
 
