@@ -6,10 +6,11 @@ import Layout from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Send, ArrowLeft } from "lucide-react";
+import { MessageSquare, Send, ArrowLeft, ImagePlus, Camera, ExternalLink, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import TrustBadges from "@/components/TrustBadges";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 
 type ChatThread = Tables<"chat_threads"> & {
