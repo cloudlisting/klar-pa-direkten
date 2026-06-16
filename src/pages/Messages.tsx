@@ -301,7 +301,7 @@ const Messages = () => {
                     <p className="text-sm text-muted-foreground">Inga meddelanden ännu. Skriv det första!</p>
                   </div>
                 )}
-                {messages.map((msg) => (
+                {messages.map((msg: any) => (
                   <motion.div
                     key={msg.id}
                     initial={{ opacity: 0, y: 5 }}
@@ -309,14 +309,25 @@ const Messages = () => {
                     className={`flex ${msg.sender_user_id === user?.id ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[75%] rounded-xl px-4 py-2 ${
+                      className={`max-w-[75%] rounded-xl px-3 py-2 ${
                         msg.sender_user_id === user?.id
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary text-secondary-foreground"
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap break-words">{msg.body}</p>
-                      <p className="text-xs opacity-70 mt-1">
+                      {msg.media_url && signedUrls[msg.media_url] && (
+                        <a href={signedUrls[msg.media_url]} target="_blank" rel="noopener noreferrer">
+                          <img
+                            src={signedUrls[msg.media_url]}
+                            alt="Bifogad bild"
+                            className="rounded-lg max-h-64 mb-1"
+                          />
+                        </a>
+                      )}
+                      {msg.body && (
+                        <p className="text-sm whitespace-pre-wrap break-words px-1">{msg.body}</p>
+                      )}
+                      <p className="text-xs opacity-70 mt-1 px-1">
                         {new Date(msg.created_at).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
@@ -324,12 +335,54 @@ const Messages = () => {
                 ))}
                 <div ref={messagesEndRef} />
               </div>
-              <form onSubmit={sendMessage} className="p-4 border-t border-border bg-card flex gap-2">
+              <form onSubmit={sendMessage} className="p-3 border-t border-border bg-card flex gap-2 items-center">
+                <input
+                  ref={galleryInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleMediaUpload(f);
+                    e.target.value = "";
+                  }}
+                />
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleMediaUpload(f);
+                    e.target.value = "";
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  disabled={uploading}
+                  onClick={() => galleryInputRef.current?.click()}
+                  aria-label="Bifoga från galleri"
+                >
+                  {uploading ? <Loader2 size={18} className="animate-spin" /> : <ImagePlus size={18} />}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  disabled={uploading}
+                  onClick={() => cameraInputRef.current?.click()}
+                  aria-label="Ta bild med kamera"
+                >
+                  <Camera size={18} />
+                </Button>
                 <Input
                   placeholder="Skriv ett meddelande..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  autoFocus
                 />
                 <Button type="submit" variant="hero" size="icon" disabled={!newMessage.trim()}>
                   <Send size={18} />
