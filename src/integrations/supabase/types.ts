@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      bids: {
+        Row: {
+          bidder_id: string
+          created_at: string
+          id: string
+          message: string | null
+          price_sek: number
+          proposed_time: string | null
+          proposed_time_text: string | null
+          status: Database["public"]["Enums"]["bid_status"]
+          task_id: string
+          updated_at: string
+        }
+        Insert: {
+          bidder_id: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          price_sek: number
+          proposed_time?: string | null
+          proposed_time_text?: string | null
+          status?: Database["public"]["Enums"]["bid_status"]
+          task_id: string
+          updated_at?: string
+        }
+        Update: {
+          bidder_id?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          price_sek?: number
+          proposed_time?: string | null
+          proposed_time_text?: string | null
+          status?: Database["public"]["Enums"]["bid_status"]
+          task_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bids_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_messages: {
         Row: {
           body: string | null
@@ -83,6 +130,57 @@ export type Database = {
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disputes: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          raised_by: string
+          reason: string
+          status: Database["public"]["Enums"]["dispute_status"]
+          task_id: string
+          thread_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          raised_by: string
+          reason: string
+          status?: Database["public"]["Enums"]["dispute_status"]
+          task_id: string
+          thread_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          raised_by?: string
+          reason?: string
+          status?: Database["public"]["Enums"]["dispute_status"]
+          task_id?: string
+          thread_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
             referencedColumns: ["id"]
           },
         ]
@@ -584,6 +682,7 @@ export type Database = {
           address_text: string | null
           assigned_tasker_id: string | null
           auto_accept_price_sek: number | null
+          budget_hint_sek: number | null
           budget_max_sek: number | null
           budget_min_sek: number | null
           budget_type: Database["public"]["Enums"]["budget_type"]
@@ -612,6 +711,7 @@ export type Database = {
           address_text?: string | null
           assigned_tasker_id?: string | null
           auto_accept_price_sek?: number | null
+          budget_hint_sek?: number | null
           budget_max_sek?: number | null
           budget_min_sek?: number | null
           budget_type?: Database["public"]["Enums"]["budget_type"]
@@ -640,6 +740,7 @@ export type Database = {
           address_text?: string | null
           assigned_tasker_id?: string | null
           auto_accept_price_sek?: number | null
+          budget_hint_sek?: number | null
           budget_max_sek?: number | null
           budget_min_sek?: number | null
           budget_type?: Database["public"]["Enums"]["budget_type"]
@@ -795,6 +896,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_bid: { Args: { p_bid_id: string }; Returns: string }
       can_access_offer: { Args: { check_offer_id: string }; Returns: boolean }
       can_access_payment: {
         Args: { check_payment_id: string }
@@ -817,7 +919,9 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "customer" | "tasker"
-      budget_type: "fixed" | "hourly"
+      bid_status: "pending" | "accepted" | "rejected" | "withdrawn"
+      budget_type: "fixed" | "hourly" | "open_for_bids"
+      dispute_status: "open" | "under_review" | "resolved"
       offer_status: "sent" | "withdrawn" | "accepted" | "rejected"
       payment_status:
         | "not_started"
@@ -971,7 +1075,9 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "customer", "tasker"],
-      budget_type: ["fixed", "hourly"],
+      bid_status: ["pending", "accepted", "rejected", "withdrawn"],
+      budget_type: ["fixed", "hourly", "open_for_bids"],
+      dispute_status: ["open", "under_review", "resolved"],
       offer_status: ["sent", "withdrawn", "accepted", "rejected"],
       payment_status: [
         "not_started",

@@ -12,9 +12,12 @@ import TrustBadges from "@/components/TrustBadges";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
+import ActiveTaskBanner from "@/components/ActiveTaskBanner";
+import DisputeDialog from "@/components/DisputeDialog";
 
+type ThreadTask = { id: string; title: string; status: string; budget_min_sek: number | null; budget_max_sek: number | null; budget_type: string | null };
 type ChatThread = Tables<"chat_threads"> & {
-  task?: { title: string; id: string };
+  task?: ThreadTask;
 };
 type ChatMessage = Tables<"chat_messages">;
 
@@ -33,6 +36,7 @@ const Messages = () => {
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
+  const [disputeOpen, setDisputeOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -89,7 +93,7 @@ const Messages = () => {
   const fetchThreads = async () => {
     const { data, error } = await supabase
       .from("chat_threads")
-      .select("*, task:tasks(id, title)")
+      .select("*, task:tasks(id, title, status, budget_min_sek, budget_max_sek, budget_type)")
       .or(`customer_user_id.eq.${user!.id},tasker_user_id.eq.${user!.id}`)
       .order("created_at", { ascending: false });
 
@@ -295,6 +299,17 @@ const Messages = () => {
                   )}
                 </div>
               </div>
+              {selectedThread.task && (
+                <ActiveTaskBanner
+                  taskId={selectedThread.task.id}
+                  title={selectedThread.task.title}
+                  status={selectedThread.task.status}
+                  priceSek={selectedThread.task.budget_max_sek ?? selectedThread.task.budget_min_sek}
+                  budgetType={selectedThread.task.budget_type}
+                  canRaiseDispute={!!user}
+                  onRaiseDispute={() => setDisputeOpen(true)}
+                />
+              )}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.length === 0 && (
                   <div className="text-center py-8">
@@ -399,6 +414,21 @@ const Messages = () => {
           )}
         </div>
       </div>
+      {selectedThread?.task && user && (
+        <DisputeDialog
+          open={disputeOpen}
+          onOpenChange={setDisputeOpen}
+          taskId={selectedThread.task.id}
+          threadId={selectedThread.id}
+          userId={user.id}
+          onRaised={() => {
+            // Refresh selected thread's task status
+            setSelectedThread((t) =>
+              t && t.task ? { ...t, task: { ...t.task, status: "disputed" } } : t
+            );
+          }}
+        />
+      )}
     </Layout>
   );
 };

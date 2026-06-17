@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, Plus, MessageSquare, User, ClipboardList } from "lucide-react";
+import { Home, Search, Plus, MessageSquare, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const HIDDEN_PATHS = [/^\/auth/, /^\/onboarding/, /^\/checkout\//];
@@ -8,9 +8,8 @@ const items = [
   { to: "/", icon: Home, label: "Hem", match: (p: string) => p === "/" },
   { to: "/browse", icon: Search, label: "Uppdrag", match: (p: string) => p.startsWith("/browse") || p.startsWith("/task/") },
   { to: "/post-task", icon: Plus, label: "Skapa", center: true, match: (p: string) => p.startsWith("/post-task") },
-  { to: "/messages", icon: MessageSquare, label: "Chatt", match: (p: string) => p.startsWith("/messages") },
-  { to: "/my-tasks", icon: ClipboardList, label: "Mina", match: (p: string) => p.startsWith("/my-tasks") },
-  { to: "/dashboard", icon: User, label: "Profil", match: (p: string) => p.startsWith("/dashboard") || p.startsWith("/settings") },
+  { to: "/messages", icon: MessageSquare, label: "Meddelanden", match: (p: string) => p.startsWith("/messages") },
+  { to: "/dashboard", icon: User, label: "Profil", match: (p: string) => p.startsWith("/dashboard") || p.startsWith("/settings") || p.startsWith("/my-tasks") },
 ];
 
 const MobileBottomNav = () => {
@@ -19,10 +18,11 @@ const MobileBottomNav = () => {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-50 md:hidden border-t border-border bg-card/95 backdrop-blur-lg pb-safe"
+      className="fixed bottom-0 inset-x-0 z-50 md:hidden border-t border-border bg-card/95 backdrop-blur-lg"
+      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
       aria-label="Mobilnavigation"
     >
-      <ul className="grid grid-cols-6 items-end px-1 pt-1.5 pb-1">
+      <ul className="grid grid-cols-5 items-end px-1 pt-1.5 pb-2">
         {items.map((item) => {
           const active = item.match(location.pathname);
           const Icon = item.icon;
@@ -36,7 +36,7 @@ const MobileBottomNav = () => {
                 >
                   <Icon size={30} strokeWidth={2.6} />
                 </Link>
-                <span className="text-[10px] font-semibold text-accent mt-1 leading-none">{item.label}</span>
+                <span className="text-[10px] font-semibold text-accent mt-1 mb-0.5 leading-none">{item.label}</span>
               </li>
             );
           }
