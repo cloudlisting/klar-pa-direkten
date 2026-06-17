@@ -256,7 +256,7 @@ const AdminDashboard = () => {
   }, [payments, paymentQuery, userById]);
 
   const cancelledOrCompleted = useMemo(
-    () => tasks.filter((t) => t.status === "cancelled" || t.status === "completed" || t.status === "paid"),
+    () => tasks.filter((t) => CLOSED_STATUSES.has(t.status)),
     [tasks]
   );
 
