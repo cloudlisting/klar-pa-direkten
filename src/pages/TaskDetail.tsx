@@ -606,10 +606,23 @@ const TaskDetail = () => {
           <div className="space-y-4">
             <div className="rounded-xl border border-border bg-card p-5 shadow-card sticky top-24">
               <div className="text-center mb-4">
-                <p className="text-3xl font-bold text-foreground">
-                  {price.toLocaleString("sv-SE")} kr
-                </p>
-                <p className="text-sm text-muted-foreground">Fast pris</p>
+                {(task as any).budget_type === "open_for_bids" ? (
+                  <>
+                    <p className="text-2xl font-bold text-foreground">Öppet för bud</p>
+                    {(task as any).budget_hint_sek && (
+                      <p className="text-sm text-muted-foreground">
+                        Riktbudget: {(task as any).budget_hint_sek.toLocaleString("sv-SE")} kr
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-3xl font-bold text-foreground">
+                      {price.toLocaleString("sv-SE")} kr
+                    </p>
+                    <p className="text-sm text-muted-foreground">Fast pris</p>
+                  </>
+                )}
               </div>
 
               {!user && (
