@@ -758,20 +758,10 @@ const AdminDashboard = () => {
                             : "—"}
                         </td>
                         <td className="p-3">
-                          <Badge
-                            variant={
-                              t.status === "cancelled" ? "destructive" : "success"
-                            }
-                          >
-                            {t.status === "cancelled" ? (
-                              <span className="inline-flex items-center gap-1">
-                                <XCircle size={12} /> Avbrutet
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1">
-                                <CheckCircle2 size={12} /> Slutfört
-                              </span>
-                            )}
+                          <Badge variant="success">
+                            <span className="inline-flex items-center gap-1">
+                              <CheckCircle2 size={12} /> Slutfört
+                            </span>
                           </Badge>
                         </td>
                         <td className="p-3 text-muted-foreground">{t.city || "—"}</td>
