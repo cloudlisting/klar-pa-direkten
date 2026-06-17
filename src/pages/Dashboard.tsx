@@ -79,12 +79,16 @@ const Dashboard = () => {
 
   const accountLinks = [
     { to: "/settings", icon: UserIcon, label: "Mitt konto" },
-    { to: "/my-tasks", icon: ClipboardList, label: "Mina uppdrag" },
-    { to: "/messages", icon: MessageSquare, label: "Mina förfrågningar" },
+    { to: "/messages", icon: MessageSquare, label: "Meddelanden" },
     { to: "/settings", icon: CreditCard, label: "Betalningar" },
     { to: "/dashboard", icon: Star, label: "Recensioner" },
     { to: "/settings", icon: Settings, label: "Inställningar" },
   ];
+
+  const activeStatuses = ["published", "in_bidding", "assigned", "in_progress", "completed_pending_release", "instant_open"];
+  const completedStatuses = ["paid", "completed_pending_release"];
+  const activeTasks = myTasks.filter((t) => activeStatuses.includes(t.status));
+  const completedTasks = myTasks.filter((t) => completedStatuses.includes(t.status));
 
   return (
     <Layout>
