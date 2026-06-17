@@ -36,6 +36,7 @@ const Messages = () => {
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
+  const [disputeOpen, setDisputeOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
