@@ -120,7 +120,7 @@ const PostTask = () => {
     title.trim().length > 2 &&
     description.trim().length > 2 &&
     city.trim().length > 0 &&
-    parseInt(price) >= 1 &&
+    (pricingMode === "open_for_bids" || parseInt(price) >= 1) &&
     (timingType === "asap" || (date && time));
 
   const uploadPhotos = async (taskId: string, uid: string) => {
