@@ -44,12 +44,18 @@ const TASK_STATUSES = [
   "in_bidding",
   "instant_open",
   "assigned",
-  "active",
-  "completed",
+  "in_progress",
+  "completed_pending_release",
   "paid",
-  "cancelled",
   "disputed",
 ];
+const BOOKED_STATUSES = new Set([
+  "assigned",
+  "in_progress",
+  "completed_pending_release",
+  "paid",
+]);
+const CLOSED_STATUSES = new Set(["paid", "completed_pending_release"]);
 
 const fmtSEK = (n: number | null | undefined) =>
   (n ?? 0).toLocaleString("sv-SE") + " kr";
