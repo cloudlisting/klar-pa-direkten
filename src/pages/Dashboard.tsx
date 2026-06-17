@@ -33,10 +33,10 @@ const Dashboard = () => {
     const { data, error } = await supabase
       .from("tasks")
       .select("*")
-      .eq("customer_user_id", user!.id)
+      .or(`customer_user_id.eq.${user!.id},assigned_tasker_id.eq.${user!.id}`)
       .order("created_at", { ascending: false })
-      .limit(5);
-    
+      .limit(20);
+
     if (!error && data) {
       setMyTasks(data);
     }
