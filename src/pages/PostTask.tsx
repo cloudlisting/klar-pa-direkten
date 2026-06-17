@@ -153,7 +153,8 @@ const PostTask = () => {
       }
       const uid = session.user.id;
 
-      const priceNum = parseInt(price);
+      const priceNum = pricingMode === "fixed" ? parseInt(price) : null;
+      const hintNum = budgetHint ? parseInt(budgetHint) : null;
       const { data, error } = await supabase
         .from("tasks")
         .insert({
@@ -170,11 +171,12 @@ const PostTask = () => {
           timing_type: timingType,
           preferred_date: timingType === "scheduled" ? date : null,
           preferred_time: timingType === "scheduled" ? time : null,
-          budget_type: "fixed" as const,
+          budget_type: pricingMode as any,
           budget_min_sek: priceNum,
           budget_max_sek: priceNum,
+          budget_hint_sek: hintNum,
           is_remote_possible: false,
-          status: "published" as const,
+          status: (pricingMode === "open_for_bids" ? "in_bidding" : "published") as const,
           assigned_tasker_id: preTaskerId || null,
           source_service_listing_id: preServiceListingId || null,
           source_tasker_service_id: preTaskerServiceId || null,
