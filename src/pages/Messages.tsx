@@ -12,9 +12,12 @@ import TrustBadges from "@/components/TrustBadges";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
+import ActiveTaskBanner from "@/components/ActiveTaskBanner";
+import DisputeDialog from "@/components/DisputeDialog";
 
+type ThreadTask = { id: string; title: string; status: string; budget_min_sek: number | null; budget_max_sek: number | null; budget_type: string | null };
 type ChatThread = Tables<"chat_threads"> & {
-  task?: { title: string; id: string };
+  task?: ThreadTask;
 };
 type ChatMessage = Tables<"chat_messages">;
 
