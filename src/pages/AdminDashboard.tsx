@@ -122,8 +122,7 @@ const AdminDashboard = () => {
     const tasksWithBids = new Set(bids.map((b) => b.task_id));
     const bidCoverage = totalTasks ? tasksWithBids.size / totalTasks : 0;
     const tasksWithoutBids = totalTasks - tasksWithBids.size;
-    const bookedStatuses = new Set(["assigned", "active", "completed", "paid"]);
-    const bookedCount = tasks.filter((t) => bookedStatuses.has(t.status)).length;
+    const bookedCount = tasks.filter((t) => BOOKED_STATUSES.has(t.status)).length;
     const bookingRate = totalTasks ? bookedCount / totalTasks : 0;
 
     const succeededPayments = payments.filter((p) =>
