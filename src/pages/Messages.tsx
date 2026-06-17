@@ -299,6 +299,17 @@ const Messages = () => {
                   )}
                 </div>
               </div>
+              {selectedThread.task && (
+                <ActiveTaskBanner
+                  taskId={selectedThread.task.id}
+                  title={selectedThread.task.title}
+                  status={selectedThread.task.status}
+                  priceSek={selectedThread.task.budget_max_sek ?? selectedThread.task.budget_min_sek}
+                  budgetType={selectedThread.task.budget_type}
+                  canRaiseDispute={!!user}
+                  onRaiseDispute={() => setDisputeOpen(true)}
+                />
+              )}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.length === 0 && (
                   <div className="text-center py-8">
