@@ -414,6 +414,21 @@ const Messages = () => {
           )}
         </div>
       </div>
+      {selectedThread?.task && user && (
+        <DisputeDialog
+          open={disputeOpen}
+          onOpenChange={setDisputeOpen}
+          taskId={selectedThread.task.id}
+          threadId={selectedThread.id}
+          userId={user.id}
+          onRaised={() => {
+            // Refresh selected thread's task status
+            setSelectedThread((t) =>
+              t && t.task ? { ...t, task: { ...t.task, status: "disputed" } } : t
+            );
+          }}
+        />
+      )}
     </Layout>
   );
 };
