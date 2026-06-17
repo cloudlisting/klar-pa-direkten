@@ -176,7 +176,7 @@ const PostTask = () => {
           budget_max_sek: priceNum,
           budget_hint_sek: hintNum,
           is_remote_possible: false,
-          status: (pricingMode === "open_for_bids" ? "in_bidding" : "published") as const,
+          status: pricingMode === "open_for_bids" ? "in_bidding" : "published",
           assigned_tasker_id: preTaskerId || null,
           source_service_listing_id: preServiceListingId || null,
           source_tasker_service_id: preTaskerServiceId || null,
