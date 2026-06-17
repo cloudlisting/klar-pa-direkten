@@ -52,6 +52,8 @@ const PostTask = () => {
   const [time, setTime] = useState("");
 
   const [price, setPrice] = useState(prePrice ?? "");
+  const [pricingMode, setPricingMode] = useState<"fixed" | "open_for_bids">("fixed");
+  const [budgetHint, setBudgetHint] = useState("");
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
