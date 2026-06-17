@@ -400,25 +400,78 @@ const PostTask = () => {
               )}
             </div>
 
-            {/* Pris */}
+            {/* Prismodell */}
             <div>
-              <Label htmlFor="price">Vad vill du föreslå för pris?</Label>
-              <div className="relative mt-1.5">
-                <Input
-                  id="price"
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  placeholder="500"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  className="h-12 text-lg pr-12"
-                />
-                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  kr
-                </span>
+              <Label>Prismodell</Label>
+              <div className="mt-1.5 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPricingMode("fixed")}
+                  className={`h-12 rounded-lg border text-sm font-medium transition-colors ${
+                    pricingMode === "fixed"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-background text-foreground hover:border-primary/40"
+                  }`}
+                >
+                  Fast pris
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPricingMode("open_for_bids")}
+                  className={`h-12 rounded-lg border text-sm font-medium transition-colors ${
+                    pricingMode === "open_for_bids"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-background text-foreground hover:border-primary/40"
+                  }`}
+                >
+                  Öppet för bud
+                </button>
               </div>
             </div>
+
+            {/* Pris */}
+            {pricingMode === "fixed" ? (
+              <div>
+                <Label htmlFor="price">Vad vill du föreslå för pris?</Label>
+                <div className="relative mt-1.5">
+                  <Input
+                    id="price"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    placeholder="500"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    className="h-12 text-lg pr-12"
+                  />
+                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    kr
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <Label htmlFor="hint">Riktbudget (valfri)</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-1.5">
+                  Utförare lägger bud. Riktbudgeten ger dem en uppfattning.
+                </p>
+                <div className="relative">
+                  <Input
+                    id="hint"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    placeholder="T.ex. 800"
+                    value={budgetHint}
+                    onChange={(e) => setBudgetHint(e.target.value)}
+                    className="h-12 text-lg pr-12"
+                  />
+                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    kr
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="sticky bottom-0 left-0 right-0 mt-6 pb-safe">
