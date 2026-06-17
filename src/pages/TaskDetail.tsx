@@ -463,7 +463,7 @@ const TaskDetail = () => {
             )}
 
             {/* Offer form for taskers */}
-            {!isOwner && isTasker && !hasOffered && (taskStatus === "published" || taskStatus === "instant_open") && (
+            {!isOwner && isTasker && !hasOffered && (taskStatus === "published" || taskStatus === "instant_open" || taskStatus === "in_bidding") && (
               <div className="rounded-xl border border-border bg-card p-5">
                 {showOfferForm ? (
                   <form onSubmit={handleSubmitOffer} className="space-y-4">
@@ -527,7 +527,7 @@ const TaskDetail = () => {
             )}
 
             {/* Message button for taskers who want to ask questions before bidding */}
-            {!isOwner && isTasker && user && (taskStatus === "published" || taskStatus === "instant_open") && (
+            {!isOwner && isTasker && user && (taskStatus === "published" || taskStatus === "instant_open" || taskStatus === "in_bidding") && (
               <div className="flex justify-center">
                 <Button
                   variant="outline"
@@ -633,7 +633,7 @@ const TaskDetail = () => {
 
 
 
-              {user && !isOwner && isTasker && !hasOffered && !canInstantAccept && (taskStatus === "published" || taskStatus === "instant_open") && (
+              {user && !isOwner && isTasker && !hasOffered && !canInstantAccept && (taskStatus === "published" || taskStatus === "instant_open" || taskStatus === "in_bidding") && (
                 <Button
                   variant="hero"
                   size="lg"
