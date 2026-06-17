@@ -295,7 +295,7 @@ const AdminDashboard = () => {
       .eq("id", d.id);
     if (error) return toast.error(error.message);
     // Reset task status if it was disputed
-    await supabase.from("tasks").update({ status: "active" as any }).eq("id", d.task_id).eq("status", "disputed");
+    await supabase.from("tasks").update({ status: "in_progress" }).eq("id", d.task_id).eq("status", "disputed");
     toast.success("Tvist markerad som löst");
     fetchData();
   };
