@@ -122,6 +122,53 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Mina uppdrag-sektion */}
+        <div className="px-4 pt-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-foreground flex items-center gap-2">
+              <ClipboardList size={18} /> Mina uppdrag
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              {activeTasks.length} aktiva • {completedTasks.length} klara
+            </span>
+          </div>
+          {loadingTasks ? (
+            <p className="text-sm text-muted-foreground">Laddar...</p>
+          ) : myTasks.length === 0 ? (
+            <div className="rounded-xl border border-border bg-card p-5 text-center">
+              <p className="text-sm text-muted-foreground mb-3">Inga uppdrag ännu</p>
+              <Button variant="hero" size="sm" asChild>
+                <Link to="/post-task">Skapa ditt första</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {[...activeTasks, ...completedTasks].slice(0, 6).map((task) => (
+                <Link
+                  key={task.id}
+                  to={`/task/${task.id}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3 hover:bg-secondary/40 transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-foreground truncate text-sm">{task.title}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {task.city} • {task.category}
+                    </p>
+                  </div>
+                  <Badge variant={getStatusVariant(task.status) as any} className="text-[10px] shrink-0">
+                    {getStatusLabel(task.status)}
+                  </Badge>
+                </Link>
+              ))}
+              {myTasks.length > 6 && (
+                <Button variant="ghost" size="sm" className="w-full" asChild>
+                  <Link to="/my-tasks">Visa alla ({myTasks.length})</Link>
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="px-4 py-5">
           <div className="rounded-2xl bg-card border border-border divide-y divide-border overflow-hidden">
             {accountLinks.map((item) => (
