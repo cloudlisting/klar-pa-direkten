@@ -1,7 +1,7 @@
 const IMAGES = {
   waste: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=400&q=80",
   errands: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80",
-  moving: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80",
+  moving: "/src/assets/delivery.avif",
   assembly: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&q=80",
   handyman: "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=400&q=80",
   cleaning: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80",
