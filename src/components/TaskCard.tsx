@@ -41,16 +41,15 @@ const TaskCard = ({ task }: TaskCardProps) => {
           loading="lazy"
         />
         {/* Poster + rating, bottom-left mini badge */}
-        <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">
-          <span className="truncate max-w-[100px]">{task.postedBy}</span>
+        <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg bg-black/75 px-3 py-1.5 text-[12px] font-semibold text-white backdrop-blur-md">
+          <span className="truncate max-w-[120px]">{task.postedBy}</span>
           {ratingCount && ratingCount > 0 ? (
-            <span className="flex items-center gap-0.5 text-amber-300">
-              <Star size={10} className="fill-amber-300" />
+            <span className="flex items-center gap-0.5 text-amber-300 whitespace-nowrap">
+              <Star size={12} className="fill-amber-300" />
               {(rating ?? 0).toFixed(1)}
-              <span className="text-white/70">({ratingCount})</span>
             </span>
           ) : (
-            <span className="text-white/70">· Ny</span>
+            <span className="text-gray-400 text-[10px] whitespace-nowrap">Ny</span>
           )}
         </div>
       </div>
