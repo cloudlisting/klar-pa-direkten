@@ -12,7 +12,7 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type Task = Tables<"tasks">;
 type Profile = Tables<"profiles">;
-type TaskWithOffers = Task & { offers_count: number; poster?: Profile };
+type TaskWithOffers = Task & { offers_count: number; poster?: Profile; photo_url?: string };
 
 const BrowseTasks = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,9 +45,10 @@ const BrowseTasks = () => {
     if (!error && data) {
       const taskIds = data.map((t) => t.id);
       const customerIds = Array.from(new Set(data.map((t) => t.customer_user_id)));
-      const [{ data: offerCounts }, { data: posters }] = await Promise.all([
+      const [{ data: offerCounts }, { data: posters }, { data: photos }] = await Promise.all([
         supabase.from("offers").select("task_id").in("task_id", taskIds),
         supabase.from("public_profiles" as any).select("*").in("id", customerIds) as any,
+        supabase.from("task_photos").select("task_id, url").in("task_id", taskIds),
       ]);
 
       const countsMap: Record<string, number> = {};
@@ -56,12 +57,17 @@ const BrowseTasks = () => {
       });
       const posterMap: Record<string, Profile> = {};
       posters?.forEach((p) => (posterMap[p.id] = p));
+      const photoMap: Record<string, string> = {};
+      photos?.forEach((p) => {
+        if (!photoMap[p.task_id]) photoMap[p.task_id] = p.url;
+      });
 
       setTasks(
         data.map((t) => ({
           ...t,
           offers_count: countsMap[t.id] || 0,
           poster: posterMap[t.customer_user_id],
+          photo_url: photoMap[t.id],
         }))
       );
     }
@@ -195,6 +201,7 @@ const BrowseTasks = () => {
                   postedBy: task.poster?.name || "Kund",
                   postedAt: new Date(task.created_at).toLocaleDateString("sv-SE"),
                   offersCount: task.offers_count,
+                  photoUrl: task.photo_url,
                   posterTrust: task.poster
                     ? {
                         rating_avg: task.poster.rating_avg,

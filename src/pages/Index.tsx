@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { getCategoryFallbackImage } from "@/lib/categoryImages";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -221,31 +222,14 @@ const Index = () => {
                       className="min-w-[180px] max-w-[180px] snap-start block rounded-2xl border border-border bg-card overflow-hidden shadow-card transition-all duration-200 hover:shadow-md active:scale-[0.98]"
                     >
                       <div
-                        className={`relative h-[125px] ${task.photo_url ? "" : catColor} flex items-center justify-center`}
+                        className={`relative h-[125px] ${task.photo_url ? "" : catColor} flex items-center justify-center overflow-hidden`}
                       >
-                        {task.photo_url ? (
-                          <img
-                            src={task.photo_url}
-                            alt={task.title}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span className="text-4xl">
-                            {{
-                              "Avfall & återvinning": "🗑️",
-                              "Inköp & ärenden": "🛍️",
-                              "Flytt & transport": "📦",
-                              Möbelmontering: "🪛",
-                              "Småfix i hemmet": "🔧",
-                              Städning: "🧹",
-                              "Trädgård & utemiljö": "🌿",
-                              "IT- & teknikhjälp": "💻",
-                              Djur: "🐶",
-                              Övrigt: "✨",
-                            }[task.category] || "📋"}
-                          </span>
-                        )}
+                        <img
+                          src={task.photo_url || getCategoryFallbackImage(task.category, task.title)}
+                          alt={task.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
                         <div className="absolute top-2 left-2">
                           <Badge
                             className={`text-[10px] font-semibold px-2 py-0.5 ${
