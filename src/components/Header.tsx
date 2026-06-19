@@ -50,16 +50,29 @@ const Header = () => {
             <ChevronDown size={14} className="text-muted-foreground" />
           </button>
 
-          {/* Profile avatar */}
-          <Link
-            to={user ? "/dashboard" : "/auth"}
-            className="flex flex-col items-center gap-0.5 active:scale-95 transition-transform"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-[12px] font-bold text-primary border border-primary/20">
-              {userInitials || "M"}
-            </div>
-            <span className="text-[10px] text-muted-foreground leading-none">Min profil</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            {/* Admin shortcut (admins only) */}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                aria-label="Admin"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10 text-destructive border border-destructive/20 active:scale-95 transition-transform"
+              >
+                <Shield size={18} />
+              </Link>
+            )}
+
+            {/* Profile avatar */}
+            <Link
+              to={user ? "/dashboard" : "/auth"}
+              className="flex flex-col items-center gap-0.5 active:scale-95 transition-transform"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-[12px] font-bold text-primary border border-primary/20">
+                {userInitials || "M"}
+              </div>
+              <span className="text-[10px] text-muted-foreground leading-none">Min profil</span>
+            </Link>
+          </div>
         </div>
       </div>
 
