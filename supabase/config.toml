@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+[functions.signicat-bankid-start]
+verify_jwt = false
+
+[functions.signicat-bankid-callback]
+verify_jwt = false

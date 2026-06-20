@@ -9,6 +9,7 @@ import { I18nProvider } from "@/lib/i18n";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
+import VerifyBankId from "./pages/VerifyBankId";
 import Dashboard from "./pages/Dashboard";
 import TaskerDashboard from "./pages/TaskerDashboard";
 import BecomeTasker from "./pages/BecomeTasker";
@@ -49,6 +50,10 @@ const OnboardingGate = () => {
   return null;
 };
 
+// BankID via Signicat is not yet live (waiting on production credentials from
+// Signicat support) — verification is reachable from /verify-bankid and
+// Settings, but not yet forced on anyone.
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <I18nProvider>
@@ -62,6 +67,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/verify-bankid" element={<VerifyBankId />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/tasker-dashboard" element={<TaskerDashboard />} />
             <Route path="/become-tasker" element={<BecomeTasker />} />

@@ -50,6 +50,21 @@ class StripeProvider implements PaymentProvider {
   }
 }
 
+// Bestämmer vilka betalmetoder Stripe Checkout ska erbjuda.
+// Kort är alltid med (standard). Klarna läggs till bakom miljöflagga + beloppsregel.
+// TODO (innan production): aktivera Klarna i Stripe-dashboarden (Payment methods)
+// och sätt env ENABLE_KLARNA="true".
+const KLARNA_MIN_AMOUNT_SEK = 1000;
+
+function getCheckoutPaymentMethodTypes(amountSek: number): string[] {
+  const types = ["card"];
+  if (Deno.env.get("ENABLE_KLARNA") === "true" && amountSek >= KLARNA_MIN_AMOUNT_SEK) {
+    types.push("klarna");
+  }
+  // Swish via Stripe kräver särskild aktivering per konto; lämnas avstängt tills vidare.
+  return types;
+}
+
 // Factory for payment providers - extensible for Swish/Klarna
 function getPaymentProvider(provider: string = "stripe"): PaymentProvider {
   const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -130,9 +145,13 @@ serve(async (req) => {
           customerId = customer.id;
         }
 
+        // Erbjud kort som standard, och Klarna när det är aktiverat + beloppet räcker.
+        const paymentMethodTypes = getCheckoutPaymentMethodTypes(totalAmount);
+
         // Create checkout session
         const session = await stripe.checkout.sessions.create({
           customer: customerId,
+          payment_method_types: paymentMethodTypes as any,
           line_items: [
             {
               price_data: {

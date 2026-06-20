@@ -8,7 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User, ShieldCheck } from "lucide-react";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 type Mode = "login" | "signup" | "reset";
 
@@ -58,6 +60,10 @@ const Auth = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBankId = () => {
+    window.location.href = `${SUPABASE_URL}/functions/v1/signicat-bankid-start?flow=login`;
   };
 
   const handleGoogle = async () => {
@@ -113,6 +119,20 @@ const Auth = () => {
             </svg>
             Fortsätt med Google
           </Button>
+          )}
+
+          {!isReset && isLogin && (
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              className="mt-2 w-full gap-2"
+              onClick={handleBankId}
+              disabled={loading}
+            >
+              <ShieldCheck size={18} className="text-primary" />
+              Logga in med BankID
+            </Button>
           )}
 
           {!isReset && (

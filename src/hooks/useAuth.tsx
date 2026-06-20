@@ -9,6 +9,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isTasker: boolean;
   needsOnboarding: boolean;
+  bankidVerified: boolean;
   profileLoaded: boolean;
   signOut: () => Promise<void>;
   refreshTaskerStatus: () => Promise<void>;
@@ -32,16 +33,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTasker, setIsTasker] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [bankidVerified, setBankidVerified] = useState(false);
   const [profileLoaded, setProfileLoaded] = useState(false);
 
   const loadProfileFlags = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("onboarding_completed" as any)
+      .select("onboarding_completed, bankid_verified" as any)
       .eq("id", userId)
       .maybeSingle();
     const completed = (data as any)?.onboarding_completed === true;
     setNeedsOnboarding(!completed);
+    setBankidVerified((data as any)?.bankid_verified === true);
     setProfileLoaded(true);
   }, []);
 
@@ -90,6 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsAdmin(false);
           setIsTasker(false);
           setNeedsOnboarding(false);
+          setBankidVerified(false);
           setProfileLoaded(false);
         }
 
@@ -131,6 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAdmin(false);
     setIsTasker(false);
     setNeedsOnboarding(false);
+    setBankidVerified(false);
     setProfileLoaded(false);
   };
 
@@ -143,6 +148,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAdmin,
         isTasker,
         needsOnboarding,
+        bankidVerified,
         profileLoaded,
         signOut,
         refreshTaskerStatus,

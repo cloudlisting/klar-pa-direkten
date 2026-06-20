@@ -9,12 +9,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { ShieldCheck } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+
 const Settings = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, bankidVerified, signOut } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
@@ -73,6 +76,13 @@ const Settings = () => {
     }
   };
 
+  const startBankIdVerification = async () => {
+    const { data } = await supabase.auth.getSession();
+    const accessToken = data.session?.access_token;
+    if (!accessToken) return;
+    window.location.href = `${SUPABASE_URL}/functions/v1/signicat-bankid-start?flow=register&access_token=${encodeURIComponent(accessToken)}`;
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -128,6 +138,26 @@ const Settings = () => {
                 {saving ? "Sparar..." : "Spara ändringar"}
               </Button>
             </form>
+          </div>
+
+          <div className="rounded-xl border border-border bg-card p-6 shadow-card mb-6">
+            <h2 className="flex items-center gap-2 font-semibold text-foreground mb-2">
+              <ShieldCheck size={18} className="text-primary" />
+              BankID-verifiering
+            </h2>
+            {bankidVerified ? (
+              <p className="text-sm text-muted-foreground">Du är verifierad med BankID.</p>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Frivilligt just nu. Verifiera dig med BankID för att visa andra att du är
+                  identitetskontrollerad.
+                </p>
+                <Button variant="outline" onClick={startBankIdVerification}>
+                  Verifiera med BankID
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Referral Section */}

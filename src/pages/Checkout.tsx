@@ -11,6 +11,8 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { calculateFees, CUSTOMER_FEE_PERCENT, TASKER_FEE_PERCENT } from "@/lib/constants";
 import TrustBadges from "@/components/TrustBadges";
+import PaymentMethods from "@/components/PaymentMethods";
+import { PAYMENT_FLAGS, isKlarnaEligible } from "@/lib/payments";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Task = Tables<"tasks">;
@@ -259,6 +261,25 @@ const Checkout = () => {
                   {fees.taskPrice.toLocaleString("sv-SE")} kr
                 </span>
               </div>
+            </div>
+
+            {/* Betalningsmetoder */}
+            <div className="rounded-lg border border-border p-4 mb-6">
+              <p className="text-sm font-medium text-foreground mb-2">Betalningsmetoder</p>
+              <PaymentMethods amountSek={fees.totalCustomerCharge} showUpcoming />
+              {!PAYMENT_FLAGS.enable_klarna_payments ? (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Klarna kommer snart. Just nu betalar du med kort.
+                </p>
+              ) : isKlarnaEligible(fees.totalCustomerCharge) ? (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Klarna kan väljas i kassan för det här uppdraget. Kort är förvalt.
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Kort är förvalt. Klarna kan väljas för större uppdrag.
+                </p>
+              )}
             </div>
 
             {/* Escrow info */}

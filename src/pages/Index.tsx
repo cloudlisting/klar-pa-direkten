@@ -5,6 +5,7 @@ import CategoryGrid from "@/components/CategoryGrid";
 import HeroTaskFeed from "@/components/HeroTaskFeed";
 import ServiceMarquee from "@/components/ServiceMarquee";
 import NearbyServicesRow from "@/components/NearbyServicesRow";
+import PaymentMethods from "@/components/PaymentMethods";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Shield, Zap, Star, CheckCircle, Plus, MapPin, Heart, Clock } from "lucide-react";
 import { motion } from "framer-motion";
@@ -175,7 +176,7 @@ const Index = () => {
               <div className="flex flex-col items-center px-2 text-center">
                 <CheckCircle size={16} className="mb-1 text-primary" />
                 <p className="text-[10.5px] font-semibold text-foreground leading-tight">Säker betalning</p>
-                <p className="text-[8.5px] text-muted-foreground leading-tight">Swish · Klarna</p>
+                <PaymentMethods showUpcoming className="mt-1 justify-center gap-1" />
               </div>
               <div className="flex flex-col items-center px-2 text-center">
                 <Star size={16} className="mb-1 text-primary" />
@@ -437,10 +438,17 @@ const Index = () => {
           <div className="container text-center">
             <Shield className="mx-auto mb-4 text-primary-foreground/80" size={36} />
             <h2 className="text-3xl font-bold font-display text-primary-foreground mb-3">{t("sections.trustTitle")}</h2>
-            <p className="text-primary-foreground/80 max-w-md mx-auto mb-8">{t("sections.trustText")}</p>
-            <Button variant="accent" size="lg" asChild>
-              <Link to="/post-task">{t("sections.trustCta")}</Link>
-            </Button>
+            <p className="text-primary-foreground/80 max-w-md mx-auto mb-6">{t("sections.trustText")}</p>
+            {/* Säker betalning med kort, Swish och Klarna */}
+            <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-4 py-2">
+              <span className="text-sm font-medium text-primary-foreground/90">Säker betalning</span>
+              <PaymentMethods showUpcoming />
+            </div>
+            <div>
+              <Button variant="accent" size="lg" asChild>
+                <Link to="/post-task">{t("sections.trustCta")}</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </div>
