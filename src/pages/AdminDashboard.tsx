@@ -132,6 +132,8 @@ const AdminDashboard = () => {
   const [notes, setNotes] = useState<AdminNote[]>([]);
   const [settings, setSettings] = useState<Record<string, any>>({});
   const [loadingData, setLoadingData] = useState(true);
+  const [allowed, setAllowed] = useState(false);
+  const [roleChecked, setRoleChecked] = useState(false);
 
   // filters
   const [userQuery, setUserQuery] = useState("");
@@ -140,14 +142,39 @@ const AdminDashboard = () => {
   const [paymentQuery, setPaymentQuery] = useState("");
   const [verifQuery, setVerifQuery] = useState("");
 
+  // Authoritative access check — query the role directly so we never bounce an
+  // admin due to context still loading (avoids the redirect race).
   useEffect(() => {
-    if (!loading && !user) navigate("/auth");
-    else if (!loading && user && !isAdmin) navigate("/dashboard");
-  }, [user, loading, isAdmin, navigate]);
+    if (loading) return;
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    let active = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (!active) return;
+      if (data && !error) {
+        setAllowed(true);
+        setRoleChecked(true);
+      } else {
+        setRoleChecked(true);
+        navigate("/dashboard");
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [user, loading, navigate]);
 
   useEffect(() => {
-    if (user && isAdmin) fetchData();
-  }, [user, isAdmin]);
+    if (user && allowed) fetchData();
+  }, [user, allowed]);
 
   const fetchData = async () => {
     setLoadingData(true);
@@ -503,7 +530,7 @@ const AdminDashboard = () => {
     }
   };
 
-  if (loading || loadingData) {
+  if (loading || !roleChecked || (allowed && loadingData)) {
     return (
       <Layout>
         <div className="container py-16 text-center">
@@ -513,7 +540,7 @@ const AdminDashboard = () => {
     );
   }
 
-  if (!isAdmin) {
+  if (!allowed) {
     return (
       <Layout>
         <div className="container py-16 text-center">
